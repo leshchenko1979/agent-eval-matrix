@@ -6,28 +6,32 @@ Matrix evaluation for **pure file-editing** agents built with [pydantic-ai](http
 
 ## Setup
 
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -e ".[dev]"
+Requires [uv](https://docs.astral.sh/uv/) and Python >=3.11 (`requires-python` in `pyproject.toml`).
 
+```bash
+# one-time: install uv (skip if already installed)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+uv sync --extra dev          # creates/reuses .venv from uv.lock
 cp .env.example .env
 # Set API keys required by your matrix's model presets (see src/harness/config.py)
 ```
+
+Re-run `uv sync --extra dev` only when `uv.lock` or `pyproject.toml` changes. Do not recreate `.venv` manually.
 
 ## Run
 
 Default matrix: [`experiments/matrices/full.yaml`](experiments/matrices/full.yaml).
 
 ```bash
-python -m harness.matrix run
-python -m harness.matrix run --matrix experiments/matrices/ci.yaml
-python -m harness.matrix run --variant <tool-set>/<model-preset>
-python -m harness.evals run --case <case_name> --tool-set <tool_set>
-python -m harness.matrix run --trace   # JSONL traces → reports/traces/
+uv run python -m harness.matrix run
+uv run python -m harness.matrix run --matrix experiments/matrices/ci.yaml
+uv run python -m harness.matrix run --variant <tool-set>/<model-preset>
+uv run python -m harness.evals run --case <case_name> --tool-set <tool_set>
+uv run python -m harness.matrix run --trace   # JSONL traces → reports/traces/
 ```
 
-Installed entry points: `harness-matrix`, `harness-evals`.
+After `source .venv/bin/activate`, you can omit the `uv run` prefix. Installed entry points: `harness-matrix`, `harness-evals`.
 
 ## Layout
 

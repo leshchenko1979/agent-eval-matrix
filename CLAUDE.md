@@ -6,16 +6,19 @@ Matrix evals over **cases** (YAML) × **tool sets** (YAML) × **models** (preset
 
 ## Run locally
 
+**Setup (once, or when lock/deps change):** `uv sync --extra dev` — creates/reuses `.venv` from `uv.lock`. **Never** run `python3 -m venv`; re-sync only when `uv.lock` or `pyproject.toml` changes.
+
 ```bash
-source .venv/bin/activate
-pip install -e ".[dev]"
+uv sync --extra dev
 # .env: MINIMAX_API_KEY
 
-python -m harness.matrix run
-python -m harness.matrix run --matrix experiments/matrices/ci.yaml
-python -m harness.evals run --case add_docstring --tool-set baseline
-python -m harness.matrix run --variant strict/verbose/minimax-m2.7
+uv run python -m harness.matrix run
+uv run python -m harness.matrix run --matrix experiments/matrices/ci.yaml
+uv run python -m harness.evals run --case add_docstring --tool-set baseline
+uv run python -m harness.matrix run --variant strict/verbose/minimax-m2.7
 ```
+
+After `source .venv/bin/activate`, omit the `uv run` prefix.
 
 ## Layout
 
@@ -55,7 +58,7 @@ python -m harness.matrix run --matrix experiments/matrices/hashline_hypotheses.y
 
 Pass/fail is still **file content match** only; `print_summary` adds hypothesis deltas, H4 pass rates by `language:python` / `language:yaml`, and `size:large` vs small buckets.
 
-**Report for OpenCrabs upstream:** [docs/hashline_hypothesis_report.md](docs/hashline_hypothesis_report.md) (prose), [docs/hashline_hypothesis_report.ipynb](docs/hashline_hypothesis_report.ipynb) (charts). Index: [docs/README.md](docs/README.md). Regenerate figures: `pip install -e ".[report]"` then `python docs/_build_report_viz.py`.
+**Report for OpenCrabs upstream:** [docs/hashline_hypothesis_report.md](docs/hashline_hypothesis_report.md) (prose), [docs/hashline_hypothesis_report.ipynb](docs/hashline_hypothesis_report.ipynb) (charts). Index: [docs/README.md](docs/README.md). Regenerate figures: `uv sync --extra report` then `uv run python docs/_build_report_viz.py`.
 
 ## Run metrics (comparison only; pass/fail = file match)
 

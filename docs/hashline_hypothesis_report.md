@@ -249,10 +249,10 @@ One isolated change per variant vs the **original OpenCrabs toolset**. Pass crit
 **Limitations:** single model; Python port ≠ Rust; eval-authored cases; exact-match pass criterion; no upstream pre-registration.
 
 ```bash
-pip install -e ".[report]"
+uv sync --extra report
 # matrix runner CLI (harness_test package)
-python -m harness.matrix run --matrix experiments/matrices/hashline_hypotheses.yaml
-python docs/_build_report_viz.py
+uv run python -m harness.matrix run --matrix experiments/matrices/hashline_hypotheses.yaml
+uv run python docs/_build_report_viz.py
 jupyter nbconvert --execute --to notebook docs/hashline_hypothesis_report.ipynb
 ```
 

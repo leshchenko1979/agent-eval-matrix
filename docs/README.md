@@ -11,6 +11,6 @@ Report for **OpenCrabs** developers (upstream was not consulted before this stud
 **Verdicts:** H2 fuzzy replace **supported** (10/10, lower tokens); H3 empty-hash collisions **rejected** (worst efficiency); H1 inconclusive; H4 mixed (equal pass, reference cheaper).
 
 ```bash
-pip install -e ".[report]"
-python docs/_build_report_viz.py
+uv sync --extra report
+uv run python docs/_build_report_viz.py
 ```
