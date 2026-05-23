@@ -1,0 +1,16 @@
+from __future__ import annotations
+
+from pydantic_ai import Agent
+
+from harness.config import get_model
+from harness.models import ExperimentVariant, FileEditDeps
+
+
+def build_agent(variant: ExperimentVariant) -> Agent[FileEditDeps]:
+    model = get_model(variant.model_id)
+    return Agent(
+        model,
+        system_prompt=variant.system_prompt,
+        deps_type=FileEditDeps,
+        tools=variant.tools,
+    )

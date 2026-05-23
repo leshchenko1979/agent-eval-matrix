@@ -1,0 +1,7 @@
+name: all
+cases:
+  - add_docstring
+  - ambiguous_replace
+  - whitespace_trap
+  - rename_symbol
+  - missing_file

@@ -1,0 +1,12 @@
+name: hashline_hypotheses
+cases:
+  - whitespace_trap
+  - whitespace_trap_yaml
+  - ambiguous_replace
+  - indent_collision
+  - whitespace_trap_py_large
+  - whitespace_trap_yaml_large
+  - ambiguous_replace_large
+  - add_docstring_large
+  - rename_symbol_large
+  - indent_collision_large

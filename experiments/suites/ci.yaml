@@ -1,0 +1,7 @@
+matrix:
+  tool_sets:
+    - baseline
+  models:
+    - minimax-m2.7
+  case_sets:
+    - smoke
