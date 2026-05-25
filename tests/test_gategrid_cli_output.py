@@ -66,8 +66,8 @@ def test_format_cell_failure_includes_diff() -> None:
     )
     text = format_cell_failure(
         cell,
-        matrix_path=Path("evals/matrices/x.yaml"),
-        eval_root=Path("evals"),
+        matrix_path=Path("examples/opencrabs/matrices/x.yaml"),
+        eval_root=Path("examples/opencrabs"),
     )
     assert "output differs" in text
     assert "--- a" in text
@@ -137,8 +137,8 @@ def test_cli_run_case_filter_warning_subprocess(tmp_path: Path) -> None:
     env = os.environ.copy()
     env["GATEGRID_HOME"] = str(home)
     env["PYTHONPATH"] = str(REPO_ROOT / "src")
-    env["GATEGRID_EVAL_ROOT"] = str(REPO_ROOT / "evals")
-    matrix = REPO_ROOT / "evals/matrices/hashline-smoke.yaml"
+    env["GATEGRID_EVAL_ROOT"] = str(REPO_ROOT / "examples" / "opencrabs")
+    matrix = REPO_ROOT / "examples/opencrabs/matrices/hashline-smoke.yaml"
     proc = subprocess.run(
         [
             sys.executable,
@@ -148,7 +148,7 @@ def test_cli_run_case_filter_warning_subprocess(tmp_path: Path) -> None:
             "--matrix",
             str(matrix),
             "--root",
-            str(REPO_ROOT / "evals"),
+            str(REPO_ROOT / "examples" / "opencrabs"),
             "--case",
             "indent_collision",
         ],

@@ -28,6 +28,7 @@ def _mock_artifact(user_prompt: str) -> RunArtifact:
             Message(role="tool", name="add", content="12"),
             Message(role="assistant", content="12"),
         ],
+        tools_called={"add": 1},
         metrics={
             "mcp_errors": 0,
             "tool_call_count": 1,
@@ -39,9 +40,8 @@ def _mock_artifact(user_prompt: str) -> RunArtifact:
 
 def _apply_mcp_metrics(artifact: RunArtifact) -> RunArtifact:
     artifact.metrics["mcp_errors"] = int(artifact.metrics.get("mcp_errors", 0))
-    if "tool_call_count" not in artifact.metrics:
-        total = sum(int(v) for v in artifact.tools_called.values())
-        artifact.metrics["tool_call_count"] = total if total else 1
+    total = sum(int(v) for v in artifact.tools_called.values())
+    artifact.metrics["tool_call_count"] = total
     return artifact
 
 

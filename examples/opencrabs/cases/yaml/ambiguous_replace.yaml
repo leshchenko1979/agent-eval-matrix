@@ -1,0 +1,15 @@
+name: ambiguous_replace
+instruction: Change only the first occurrence of 'value = 1' to 'value = 2' in data.py
+file_name: data.py
+initial_content: |
+  value = 1
+  x = value = 1
+  print(value)
+
+expected_output: |
+  value = 2
+  x = value = 1
+  print(value)
+
+tags:
+  - language:python

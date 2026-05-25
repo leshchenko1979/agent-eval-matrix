@@ -61,5 +61,5 @@ User eval trees without `cases/` can run matrices that reference builtin ids or 
 | MCP pydantic-ai toolsets | `gategrid.integrations.pydantic_ai.mcp_servers` — `pip install gategrid[pydantic-ai,mcp]` |
 | `load_tool_functions` (eval-root `.py` only) | `gategrid.integrations.pydantic_ai.tools` |
 | `RuntimeAdapter` wiring | User `evals/adapters/` or `examples/file_edit/adapters/` |
-| Product agent tools (OpenCrabs hashline) | User `evals/tooling/opencrabs/` |
+| Product agent tools (OpenCrabs hashline) | [examples/opencrabs/tooling/opencrabs/](../../examples/opencrabs/tooling/opencrabs/) in this repo |
 | Re-register `file_content_match` in `evaluators/` | **Error** — duplicate id vs builtin |

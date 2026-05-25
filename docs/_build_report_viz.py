@@ -27,7 +27,7 @@ def _resolve_report_json() -> Path:
             return candidates[-1]
     print(
         "Set GATEGRID_REPORT_JSON to a Gategrid matrix report "
-        "(e.g. from gategrid run --matrix evals/matrices/hashline-bench.yaml --root evals).",
+        "(e.g. from gategrid run --matrix examples/opencrabs/matrices/hashline-bench.yaml --root examples/opencrabs).",
         file=sys.stderr,
     )
     sys.exit(1)

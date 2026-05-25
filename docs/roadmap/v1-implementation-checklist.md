@@ -24,7 +24,7 @@ Ship the **competitive wedge**: matrix runner + **git baseline gate** + **Python
 
 `**schemas/v1`:** frozen **outputs** and **matrix config** (`case_id` on cells, not case content). Legacy `EditCase` YAML is **not** a core contract.
 
-**Legacy removed (2026-05):** `src/agent_eval_matrix/` and [experiments/](../../experiments/) deleted after Spike C. Dogfood lives in repo-root [`evals/`](../../evals/). See [Legacy teardown](#legacy-teardown-after-spike-c).
+**Legacy removed (2026-05):** `src/agent_eval_matrix/` and [experiments/](../../experiments/) deleted after Spike C. OpenCrabs dogfood lives in [`examples/opencrabs/`](../../examples/opencrabs/). See [Legacy teardown](#legacy-teardown-after-spike-c).
 
 **Spike → contrib:** Dogfooding may start with code in a target repo’s `evals/`. When a pattern is **reusable across repos** (second spike needs it, or it’s clearly not project-specific), **promote it to `gategrid.contrib`** (optional extra if deps are heavy). Keep one-off wiring in the user repo.
 
@@ -38,12 +38,12 @@ Ship the **competitive wedge**: matrix runner + **git baseline gate** + **Python
 | `[legacy]` extra, pydantic-evals bridge, legacy report readers         | Gategrid models + `gategrid run` only                          |
 | `agent-eval-matrix` / `agent-eval` CLIs                                | `gategrid` CLI only                                            |
 | `.agent-eval-matrix/`, repo-root `reports/` for Gategrid               | `.gategrid/` only                                              |
-| `tool_sets` in matrix YAML, `experiments/` as runtime root             | `profiles` + `evals/` or `examples/gategrid/`                  |
+| `tool_sets` in matrix YAML, `experiments/` as runtime root             | `profiles` + user `evals/` or `examples/*` in this repo       |
 | `EditCase` / `cases/*.yaml` / sandbox / `FileContentMatch` **in core** | `@case` + `RuntimeAdapter` in core; file-edit in `**contrib`** |
 | Dual baseline / report converters                                      | `MatrixReport` → `baseline update` → `gate`                    |
 
 
-Legacy harness removed; Gategrid core/CI uses `examples/gategrid/` and `evals/` only.
+Legacy harness removed; Gategrid core/CI uses `examples/gategrid/` and `examples/opencrabs/`.
 
 ---
 
@@ -305,11 +305,11 @@ evals/
 | #       | Task                                                                                                                                                | Needs         |
 | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
 | C.0     | [x] Gategrid-only policy in [dogfood-notes.md](dogfood-notes.md)                                                                                    | —             |
-| C.1     | [x] Hashline under `evals/` (ported from legacy `experiments/`; legacy removed in teardown) | 3.4, 2.2      |
+| C.1     | [x] Hashline under `examples/opencrabs/` (ported from legacy `experiments/`) | 3.4, 2.2      |
 | C.2     | [x] `gategrid run` + `opencrabs_original` profile via **adapter** (Python tools or binary stretch)                                                  | 3.4, 2.4      |
 | C.3     | [x] `baseline update` + `gate` loop; record in dogfood-notes                                                                                        | 5.x workflows |
 | C.4     | [x] Regression drill (gate exit 1 on bad report, 0 on good)                                                                                         | dogfood-notes |
-| C.5     | [x] Repo-root `evals/` layout documented                                                                                                              | dogfood-notes |
+| C.5     | [x] `examples/opencrabs/` layout documented                                                                                                         | dogfood-notes |
 | C.6     | [x] `hashline-bench.yaml` run on Gategrid (minimax; 44/50 pass, rate limits — dogfood-notes)                                                          | dogfood-notes |
 | C.7     | [x] [hashline_hypothesis_report.md](../hashline_hypothesis_report.md) points at `.gategrid/reports/`                                                  |               |
 | C.8–C.9 | [ ] Stretch: Rust binary adapter; upstream CONTRIBUTING                                                                                             |               |
@@ -324,7 +324,7 @@ evals/
 | #   | Task                                                                                                                  |
 | --- | --------------------------------------------------------------------------------------------------------------------- |
 | L.1 | [x] Remove `src/agent_eval_matrix/` and legacy harness tests                                                          |
-| L.2 | [x] Remove [experiments/](../../experiments/) (content in `evals/` / `contrib`)                                       |
+| L.2 | [x] Remove [experiments/](../../experiments/) (content in `examples/opencrabs/` / `contrib`)                          |
 | L.3 | [x] Switch `.github/workflows/` to Gategrid-only ([gategrid.yml](../../.github/workflows/gategrid.yml))              |
 | L.4 | [x] Update README, [CLAUDE.md](../../CLAUDE.md) — no legacy run commands                                              |
 

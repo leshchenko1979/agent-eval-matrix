@@ -4,7 +4,7 @@
 
 ## Context
 
-Hashline benchmark cases and the reference baseline tool stack lived only under repo `evals/`, forcing every consumer to copy YAML and `tooling/reference/` before running a baseline profile. Core `ProfileConfig` also carried `system_prompt` and `tools` fields that only the pydantic-ai file-edit adapter used.
+Hashline benchmark cases and the reference baseline tool stack lived only under a monorepo `evals/` tree (now `examples/opencrabs/`), forcing every consumer to copy YAML and `tooling/reference/` before running a baseline profile. Core `ProfileConfig` also carried `system_prompt` and `tools` fields that only the pydantic-ai file-edit adapter used.
 
 ## Decisions
 
@@ -21,12 +21,12 @@ Hashline benchmark cases and the reference baseline tool stack lived only under 
 | LLM tool names | `Tool(callable, name=exposed)` — e.g. `builtin:read_file` → model sees `read_file` (prompt text unchanged) |
 | `glob` | `builtin:glob` → exposed name `glob` (implementation `glob_tool`) |
 | Duplicate exposed name | Same profile lists `builtin:read_file` and `tooling/read_file.py` → `ValueError` at load |
-| Fuzzy replace | Not bundled; `evals/tooling/fuzzy/` for OpenCrabs h2 dogfood |
+| Fuzzy replace | Not bundled; `examples/opencrabs/tooling/fuzzy/` for OpenCrabs h2 |
 | Onboarding | `examples/file_edit/` — minimal tree, builtins only |
 
 ## Consequences
 
-- `evals/cases/` and `evals/tooling/reference/` removed from dogfood tree; matrices keep same case ids.
+- Custom `cases/` and `tooling/reference/` removed from consumer obligation when using batteries; OpenCrabs example keeps full tree under `examples/opencrabs/`.
 - Spike B / MCP adapters can use `profile.data` without file-edit fields on core.
 - ADR 0003 discovery row amended for optional `cases/`.
 

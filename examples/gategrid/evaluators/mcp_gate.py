@@ -21,7 +21,9 @@ def mcp_tooling_ok(ctx: RunContext, artifact: RunArtifact) -> EvaluatorOutcome:
             detail=str(errors),
         )
 
-    calls = int(artifact.metrics.get("tool_call_count", 0))
+    calls = sum(int(v) for v in artifact.tools_called.values())
+    if calls < 1:
+        calls = int(artifact.metrics.get("tool_call_count", 0))
     if calls < 1:
         return EvaluatorOutcome(
             pass_=False,

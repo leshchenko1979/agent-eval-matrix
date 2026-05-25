@@ -1,4 +1,4 @@
-"""Ensure evals/tooling is on sys.path for opencrabs package imports."""
+"""Ensure examples/opencrabs/tooling is on sys.path for opencrabs package imports."""
 
 from __future__ import annotations
 

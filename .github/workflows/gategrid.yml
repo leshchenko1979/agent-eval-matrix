@@ -49,5 +49,5 @@ jobs:
       - name: Hashline smoke (mock)
         env:
           GATEGRID_HOME: ${{ github.workspace }}/.gategrid-ci
-          GATEGRID_EVAL_ROOT: evals
-        run: uv run gategrid run --matrix evals/matrices/hashline-smoke.yaml --root evals
+          GATEGRID_EVAL_ROOT: examples/opencrabs
+        run: uv run gategrid run --matrix examples/opencrabs/matrices/hashline-smoke.yaml --root examples/opencrabs

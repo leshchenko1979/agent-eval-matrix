@@ -3,7 +3,7 @@
 **Status:** agreed direction (2026-05-24)
 **Goal:** A **pytest-like** eval framework: users own cases, runtimes, and evaluators; the library owns the **matrix**, **runs**, **reports**, and **regression gates**.
 
-**Ship as:** `pip install` core package. This repo keeps **`examples/`** (minimal smoke) and in-repo **`evals/`** dogfood; legacy `experiments/` removed.
+**Ship as:** `pip install` core package. This repo keeps **`examples/`** (smoke, file-edit, OpenCrabs hashline); legacy `experiments/` removed.
 
 ---
 

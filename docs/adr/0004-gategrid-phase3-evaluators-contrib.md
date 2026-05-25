@@ -23,7 +23,7 @@ Phase 2 used interim `gate_check` on `@case`. Phase 3 introduces user-owned `@ev
 | Contrib registration | `file_edit` registers builtin gate `file_content_match` via `register_builtin_evaluator` on import; other contrib evaluators still need user `evaluators/` wrappers |
 | Builtin cases | `register_builtin_case` / `register_builtin_case_set` in core (mirror evaluators); shipped hashline batteries in `contrib/file_edit/bundled/` |
 | Profile contract | Core `ProfileConfig` is `runtime_adapter` + `data` only; file-edit LLM keys (`system_prompt`, `tools`) live under `data` — see ADR 0005 |
-| 3.4 deferral | **Superseded by batteries (ADR 0005)** — file-edit adapter + baseline tools ship in contrib; OpenCrabs stays user `evals/tooling/` |
+| 3.4 deferral | **Superseded by batteries (ADR 0005)** — file-edit adapter + baseline tools ship in contrib; OpenCrabs tooling stays in `examples/opencrabs/tooling/` |
 
 ## `file_content_match` contract
 

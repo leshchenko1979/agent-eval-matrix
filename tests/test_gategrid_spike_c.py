@@ -11,12 +11,12 @@ from gategrid.executor import run_matrix_sync
 from gategrid.validate import validate_matrix
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-EVALS_ROOT = REPO_ROOT / "evals"
-SMOKE_MATRIX = EVALS_ROOT / "matrices" / "hashline-smoke.yaml"
+OPENCRABS_ROOT = REPO_ROOT / "examples" / "opencrabs"
+SMOKE_MATRIX = OPENCRABS_ROOT / "matrices" / "hashline-smoke.yaml"
 
 
 def test_validate_hashline_smoke() -> None:
-    result = validate_matrix(SMOKE_MATRIX, root=EVALS_ROOT)
+    result = validate_matrix(SMOKE_MATRIX, root=OPENCRABS_ROOT)
     assert result.ok, result.errors
 
 
@@ -24,7 +24,7 @@ def test_run_hashline_smoke_mock(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     monkeypatch.setenv("GATEGRID_HOME", str(tmp_path / ".gategrid"))
-    outcome = run_matrix_sync(SMOKE_MATRIX, eval_root=EVALS_ROOT)
+    outcome = run_matrix_sync(SMOKE_MATRIX, eval_root=OPENCRABS_ROOT)
     report = outcome.report
     assert len(report.cells) == 1
     cell = report.cells[0]
@@ -41,10 +41,10 @@ def test_cli_hashline_smoke_subprocess(tmp_path: Path) -> None:
     env = os.environ.copy()
     env["GATEGRID_HOME"] = str(home)
     env["PYTHONPATH"] = str(REPO_ROOT / "src")
-    env["GATEGRID_EVAL_ROOT"] = str(EVALS_ROOT)
+    env["GATEGRID_EVAL_ROOT"] = str(OPENCRABS_ROOT)
     for args in (
-        ["validate", "--matrix", str(SMOKE_MATRIX), "--root", str(EVALS_ROOT)],
-        ["run", "--matrix", str(SMOKE_MATRIX), "--root", str(EVALS_ROOT)],
+        ["validate", "--matrix", str(SMOKE_MATRIX), "--root", str(OPENCRABS_ROOT)],
+        ["run", "--matrix", str(SMOKE_MATRIX), "--root", str(OPENCRABS_ROOT)],
     ):
         proc = subprocess.run(
             [sys.executable, "-m", "gategrid.cli", *args],

@@ -16,26 +16,27 @@ from gategrid.models.profile_config import ProfileConfig
 from gategrid.validate import validate_matrix
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-EVALS_ROOT = REPO_ROOT / "evals"
+OPENCRABS_ROOT = REPO_ROOT / "examples" / "opencrabs"
 FILE_EDIT_EXAMPLE = REPO_ROOT / "examples/file_edit"
 
 
-def test_discover_cases_without_eval_cases_dir() -> None:
-    assert not (EVALS_ROOT / "cases").is_dir()
-    registry = discover_cases(EVALS_ROOT)
+def test_discover_cases_without_eval_cases_package() -> None:
+    """OpenCrabs example uses builtin batteries; cases/yaml/ is doc-only (no cases/__init__.py)."""
+    assert not (OPENCRABS_ROOT / "cases" / "__init__.py").is_file()
+    registry = discover_cases(OPENCRABS_ROOT)
     assert "indent_collision" in registry
     assert len(registry) >= 10
 
 
 def test_builtin_case_set_resolve_without_eval_yaml() -> None:
-    matrix_path = EVALS_ROOT / "matrices" / "hashline-gate.yaml"
+    matrix_path = OPENCRABS_ROOT / "matrices" / "hashline-gate.yaml"
     if not matrix_path.is_file():
         pytest.skip("hashline-gate matrix not present")
     matrix = load_matrix_config(matrix_path)
     if "hashline_hypotheses" not in matrix.case_sets:
         pytest.skip("matrix does not use hashline_hypotheses case set")
-    assert not (EVALS_ROOT / "case_sets" / "hashline_hypotheses.yaml").is_file()
-    ids = resolve_case_ids(matrix, EVALS_ROOT)
+    assert not (OPENCRABS_ROOT / "case_sets" / "hashline_hypotheses.yaml").is_file()
+    ids = resolve_case_ids(matrix, OPENCRABS_ROOT)
     assert "indent_collision" in ids
     assert len(ids) == 10
 
@@ -74,7 +75,7 @@ def test_duplicate_exposed_tool_name_errors(tmp_path: Path) -> None:
 
 def test_profile_data_round_trip() -> None:
     profile = load_yaml_model(
-        EVALS_ROOT / "profiles" / "baseline.yaml",
+        OPENCRABS_ROOT / "profiles" / "baseline.yaml",
         ProfileConfig,
     )
     assert profile.data.get("system_prompt")

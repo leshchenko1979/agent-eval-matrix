@@ -165,6 +165,9 @@ def evaluator(
 
 def _ensure_eval_root_on_path(eval_root: Path) -> None:
     root = str(eval_root.resolve())
+    for key in list(sys.modules):
+        if key == "adapters" or key.startswith("adapters."):
+            del sys.modules[key]
     while root in sys.path:
         sys.path.remove(root)
     sys.path.insert(0, root)

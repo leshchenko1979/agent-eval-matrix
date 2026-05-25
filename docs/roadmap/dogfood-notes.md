@@ -27,15 +27,15 @@ Checklist: [v1-implementation-checklist.md#dogfooding-spikes](v1-implementation-
 
 ## Spike C — OpenCrabs (1st)
 
-**Layout:** Repo-root [`evals/`](../../evals/) (not under `examples/`).
+**Layout:** [examples/opencrabs/](../../examples/opencrabs/) in this monorepo (consumer repos use repo-root `evals/`).
 
 **Policy:** Gategrid-only for **gated** results (`gategrid run` / `baseline update` / `gate` only). Legacy `experiments/` + `agent_eval_matrix` removed 2026-05 ([teardown L.1–L.4](v1-implementation-checklist.md#legacy-teardown-after-spike-c)).
 
-| Promoted to framework | Stays in `evals/` |
-| --------------------- | ----------------- |
+| Promoted to framework | Stays in example tree |
+| --------------------- | --------------------- |
 | `gategrid.models.env`, `gategrid.integrations.pydantic_ai`, `contrib.file_edit` (sandbox, session, `file_content_match`, **batteries**: hashline cases + baseline tools, `load_file_edit_tools`, profile `data` helpers) | `adapters/file_edit.py`, OpenCrabs tooling + fuzzy stack, opencrabs profiles, matrices |
 
-**Smoke (no API key):** `uv run gategrid run --matrix evals/matrices/hashline-smoke.yaml` with `GATEGRID_EVAL_ROOT=evals` or `--root evals`.
+**Smoke (no API key):** `gategrid run --matrix examples/opencrabs/matrices/hashline-smoke.yaml --root examples/opencrabs`.
 
 | Date | Command / matrix | Result | Verdict |
 | ---- | ---------------- | ------ | ------- |
@@ -50,7 +50,7 @@ Notes:
 
 - **Roadmap — 429 handling:** MiniMax returned HTTP 429 on 2/50 `hashline-bench` cells (infra, not eval logic). Tracked as **ADOPT-020** / [Phase 6.8](v1-implementation-checklist.md#phase-6--post-v1-defer) — transport-level retry + backoff at LLM boundary, separate from `run.max_retries`.
 - **Contrib candidates:** _e.g. file_edit sandbox/tools, opencrabs tool adapter — promote when API stable_
-- Cases/tooling live in repo-root [`evals/`](../../evals/).
+- Cases/tooling live in [`examples/opencrabs/`](../../examples/opencrabs/).
 - Report / upstream doc: [hashline_hypothesis_report.md](../hashline_hypothesis_report.md) — regenerate from Gategrid reports after C.2.
 
 ---

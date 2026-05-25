@@ -1,4 +1,4 @@
-"""Tests for evals/tooling/fuzzy/fuzzy_replace (Codex seek_sequence-style)."""
+"""Tests for examples/opencrabs/tooling/fuzzy/fuzzy_replace (Codex seek_sequence-style)."""
 
 from __future__ import annotations
 

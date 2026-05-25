@@ -166,7 +166,7 @@ External evaluation of OpenCrabs-style file-editing tools (hashline protocol, fu
 | -------- | ---- |
 | Report | [docs/hashline_hypothesis_report.md](docs/hashline_hypothesis_report.md) |
 | Charts | [docs/hashline_hypothesis_report.ipynb](docs/hashline_hypothesis_report.ipynb) |
-| In-repo repro | [evals/](evals/) matrices and profiles — see [CLAUDE.md](CLAUDE.md) |
+| In-repo repro | [examples/opencrabs/](examples/opencrabs/) — see [CLAUDE.md](CLAUDE.md) |
 
 ---
 
@@ -210,7 +210,7 @@ Python ≥3.11. Secrets via environment only.
 
 ## Contributing and development
 
-Monorepo: [src/gategrid/](src/gategrid/) (framework), [examples/gategrid/](examples/gategrid/) (smoke), [evals/](evals/) (dogfood). Operator setup, tests, and hashline matrices: [CLAUDE.md](CLAUDE.md). Coding principles: [CODE.md](CODE.md).
+Monorepo: [src/gategrid/](src/gategrid/) (framework), [examples/gategrid/](examples/gategrid/) (smoke), [examples/opencrabs/](examples/opencrabs/) (hashline study). Operator setup: [CLAUDE.md](CLAUDE.md). Coding principles: [CODE.md](CODE.md).
 
 ```bash
 uv sync --extra dev

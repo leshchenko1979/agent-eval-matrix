@@ -12,7 +12,7 @@ from gategrid.contrib.file_edit.cases import (
 )
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-EVALS_ROOT = REPO_ROOT / "evals"
+OPENCRABS_ROOT = REPO_ROOT / "examples" / "opencrabs"
 
 
 def test_register_case_from_yaml_fixture(tmp_path: Path) -> None:
@@ -43,7 +43,7 @@ def test_register_case_from_yaml_fixture(tmp_path: Path) -> None:
 
 def test_hashline_hypotheses_registers_ten_cases() -> None:
     """Builtin batteries supply hashline cases without eval_root/cases/."""
-    registry = discover_cases(EVALS_ROOT)
+    registry = discover_cases(OPENCRABS_ROOT)
     expected = {
         "whitespace_trap",
         "whitespace_trap_yaml",
