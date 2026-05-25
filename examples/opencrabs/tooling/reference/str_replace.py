@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from pydantic_ai import RunContext
 
-from gategrid.contrib.file_edit.bundled.tooling.baseline import str_replace as _str_replace
+from gategrid.contrib.file_edit.bundled.tooling.baseline import (
+    str_replace as _str_replace,
+)
 from gategrid.contrib.file_edit.deps import FileEditDeps
 
 
