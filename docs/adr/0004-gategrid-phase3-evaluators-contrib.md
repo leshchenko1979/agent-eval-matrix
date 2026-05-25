@@ -53,5 +53,5 @@ Phase 2 used interim `gate_check` on `@case`. Phase 3 introduces user-owned `@ev
 
 ## See also
 
-- [v1-implementation-checklist.md](../roadmap/v1-implementation-checklist.md) Phase 3
+- [v1-implementation-checklist.md](../roadmap/engineering/v1-implementation-checklist.md) Phase 3
 - [0003-gategrid-phase2-executor.md](0003-gategrid-phase2-executor.md)

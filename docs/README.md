@@ -1,18 +1,24 @@
-# OpenCrabs file-editing evaluation
+# Gategrid documentation
 
-Report for **OpenCrabs** developers (upstream was not consulted before this study). Tests hashline protocol changes, **two edit tools → one** fuzzy replace (H2), and comparison to a **simplified reference** tool set (H4; 8 vs 32 total tool parameters).
+Index for repo docs. **Product pitch:** [README.md](../README.md). **Agent setup:** [CLAUDE.md](../CLAUDE.md). **Coding guardrails:** [CODE.md](../CODE.md).
 
-| Artifact                                                                                              | Description                                      |
-| ----------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
-| [hashline_hypothesis_report.md](hashline_hypothesis_report.md)                                        | Full report — implementers start at §2; metrics §3 |
-| [hashline_hypothesis_report.ipynb](hashline_hypothesis_report.ipynb)                                  | Charts                                           |
-| `.gategrid/reports/*_matrix.json` | Gategrid bench output (see [hashline_hypothesis_report.md](hashline_hypothesis_report.md)) |
+## By audience
 
-**Report sections:** [§2 Quick reference](hashline_hypothesis_report.md#2-quick-reference-for-implementers) · [§3 Executive summary](hashline_hypothesis_report.md#3-executive-summary)
+| Audience | Start here |
+| -------- | ---------- |
+| Operator / CI | [docs/guides/ci.md](guides/ci.md) → [examples/gategrid/](../examples/gategrid/) |
+| Bench analysis | [docs/guides/bench-analysis.md](guides/bench-analysis.md) → [docs/reports/hashline/README.md](reports/hashline/README.md) |
+| Implementer | [CODE.md](../CODE.md) → [docs/roadmap/engineering/v1-implementation-checklist.md](roadmap/engineering/v1-implementation-checklist.md) → [docs/adr/](adr/) |
+| Spike / research | [docs/roadmap/research/spike-dx-competitive-analysis.md](roadmap/research/spike-dx-competitive-analysis.md) |
+| Positioning / GTM | [docs/roadmap/product/README-pitch-draft.md](roadmap/product/README-pitch-draft.md) |
 
-**Verdicts:** H2 fuzzy replace **supported** (10/10, lower tokens); H3 empty-hash collisions **rejected** (worst efficiency); H1 inconclusive; H4 mixed (equal pass, reference cheaper).
+## Layout
 
-```bash
-uv sync --extra report
-uv run python docs/_build_report_viz.py
-```
+| Path | Contents |
+| ---- | -------- |
+| [docs/guides/](guides/) | [CI](guides/ci.md), [bench analysis](guides/bench-analysis.md) |
+| [docs/adr/](adr/) | Frozen architecture decisions per phase |
+| [docs/roadmap/](roadmap/) | Product, engineering checklist, spike research |
+| [docs/reports/](reports/) | Published bench / hypothesis reports |
+
+Do not duplicate this tree in a GitHub Wiki — keep docs in-repo for PR review.

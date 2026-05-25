@@ -10,10 +10,6 @@ Ship the **competitive wedge**: matrix runner + **git baseline gate** + **Python
 
 **Implementation workflow:** [`.cursor/rules/gategrid-phase-workflow.mdc`](../../../.cursor/rules/gategrid-phase-workflow.mdc) — steps 1–6 for any code change; phases 1+ mark **W** when closed.
 
-**Status (2026-05):** **Framework** phases 0–5 complete. **Product** still open: PyPI ([R.1](#rename--publish)), external spikes B/A, [D.8](#integration-summary) go/no-go.
-
-**Companion docs:** [ADRs](../../adr/) and this checklist are **implementation truth**. [architecture-vision.md](architecture-vision.md) is a historical design essay (may still name pre-Gategrid paths); [docs/guides/ci.md](../../guides/ci.md) is the CI operator hub.
-
 ---
 
 ## Product shape (what ships where)
@@ -21,14 +17,14 @@ Ship the **competitive wedge**: matrix runner + **git baseline gate** + **Python
 
 | Layer                  | Owns                                                                                                                                            | Does **not** own                                                                  |
 | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| **gategrid core**      | Matrix expand · case **ids** in YAML · `@case` · `RuntimeAdapter` → `RunArtifact` · `CellExecutor` · reports · `gate` / `baseline` · `validate` | File sandbox · file-tool YAML cases · file-content pass/fail · MCP · LLM runtimes |
-| **gategrid.contrib**   | Optional reference plugins — **grown from spikes** when generalizable (adapters, evaluators, helpers); never required for core                  | Required for core install                                                         |
+| `**gategrid` core**    | Matrix expand · case **ids** in YAML · `@case` · `RuntimeAdapter` → `RunArtifact` · `CellExecutor` · reports · `gate` / `baseline` · `validate` | File sandbox · file-tool YAML cases · file-content pass/fail · MCP · LLM runtimes |
+| `**gategrid.contrib`** | Optional reference plugins — **grown from spikes** when generalizable (adapters, evaluators, helpers); never required for core                  | Required for core install                                                         |
 | **User repo `evals/`** | `@case` bodies · profiles · models · matrices · repo-specific adapters · `@evaluator`                                                           | Framework storage (uses `.gategrid/`)                                             |
 
 
-**schemas/v1:** frozen **outputs** and **matrix config** (`case_id` on cells, not case content). Legacy `EditCase` YAML is **not** a core contract.
+`**schemas/v1`:** frozen **outputs** and **matrix config** (`case_id` on cells, not case content). Legacy `EditCase` YAML is **not** a core contract.
 
-**Legacy removed (2026-05):** `src/agent_eval_matrix/` and `experiments/` deleted after Spike C (content in [`examples/opencrabs/`](../../../examples/opencrabs/) / `contrib`). See [Legacy teardown](#legacy-teardown-after-spike-c).
+**Legacy removed (2026-05):** `src/agent_eval_matrix/` and [experiments/](../../experiments/) deleted after Spike C. OpenCrabs dogfood lives in [`examples/opencrabs/`](../../../examples/opencrabs/). See [Legacy teardown](#legacy-teardown-after-spike-c).
 
 **Spike → contrib:** Dogfooding may start with code in a target repo’s `evals/`. When a pattern is **reusable across repos** (second spike needs it, or it’s clearly not project-specific), **promote it to `gategrid.contrib`** (optional extra if deps are heavy). Keep one-off wiring in the user repo.
 
@@ -43,7 +39,7 @@ Ship the **competitive wedge**: matrix runner + **git baseline gate** + **Python
 | `agent-eval-matrix` / `agent-eval` CLIs                                | `gategrid` CLI only                                            |
 | `.agent-eval-matrix/`, repo-root `reports/` for Gategrid               | `.gategrid/` only                                              |
 | `tool_sets` in matrix YAML, `experiments/` as runtime root             | `profiles` + user `evals/` or `examples/*` in this repo       |
-| `EditCase` / `cases/*.yaml` / sandbox / `FileContentMatch` **in core** | `@case` + `RuntimeAdapter` in core; file-edit in **contrib** |
+| `EditCase` / `cases/*.yaml` / sandbox / `FileContentMatch` **in core** | `@case` + `RuntimeAdapter` in core; file-edit in `**contrib`** |
 | Dual baseline / report converters                                      | `MatrixReport` → `baseline update` → `gate`                    |
 
 
@@ -102,7 +98,7 @@ Legacy harness removed; Gategrid core/CI uses `examples/gategrid/` and `examples
 
 ---
 
-## Phase 2 — Matrix execution (core) ✓
+## Phase 2 — Matrix execution (core)
 
 **Goal:** Walk the grid; produce `MatrixReport`. **Universal** runtime surface only.
 
@@ -136,7 +132,7 @@ Pass/fail was interim `gate_check` on `@case` until Phase 3 (`@evaluator`).
 
 **Goal:** User-owned scoring; `**gate`** vs `**metric`**. File-edit benchmark lives here, not in core.
 
-**ADR:** [0004-gategrid-phase3-evaluators-contrib.md](../../adr/0004-gategrid-phase3-evaluators-contrib.md) · [0005-gategrid-file-edit-batteries.md](../../adr/0005-gategrid-file-edit-batteries.md) (3.4)
+**ADR:** [0004-gategrid-phase3-evaluators-contrib.md](../../adr/0004-gategrid-phase3-evaluators-contrib.md)
 
 
 | #   | Item                                                                                                                                                                   | Notes           |
@@ -202,8 +198,6 @@ gategrid validate --matrix examples/gategrid/matrices/mcp-gate-mock.yaml --root 
 
 **ADR:** [0007-gategrid-phase5-ci-productization.md](../../adr/0007-gategrid-phase5-ci-productization.md)
 
-**CI guide:** [docs/guides/ci.md](../../guides/ci.md) — PR `gate`, `main` baseline refresh, `run.sample`, copy-paste workflows.
-
 *Note: `gategrid gate` / `baseline update` / regression math largely exist from Phase 0; this phase wires **CI, sampling, and examples**.*
 
 
@@ -216,7 +210,7 @@ gategrid validate --matrix examples/gategrid/matrices/mcp-gate-mock.yaml --root 
 | 5.4 | [x] `--baseline-from-artifact` for PR                                  |                      |
 | 5.5 | [x] `run.sample` (`max_cells`, `share`, `seed`, `always_include_tags`) |                      |
 | 5.6 | [x] Fingerprint mismatch → warn (overall regression)                   |                      |
-| 5.7 | [x] [gategrid-ci.yml](../../../.github/workflows/gategrid-ci.yml) (+ [gategrid.yml.example](../../../.github/workflows/gategrid.yml.example)) | ADOPT-005, ADOPT-014 |
+| 5.7 | [x] `pr-gate.yml`, `main-baseline-update.yml`                          | ADOPT-005, ADOPT-014 |
 | 5.8 | [x] Tiered CI: demo / smoke / full                                     | ADOPT-005            |
 | 5.9 | [x] Gate vs benchmark matrix examples                                  | pitch README         |
 
@@ -255,7 +249,6 @@ gategrid gate --matrix examples/gategrid/matrices/ci-gate-mock.yaml --root examp
 | 6.10    | [ ] **Matrix wall-time budget** — `run.max_wall_time_s`: stop scheduling new cells when elapsed cap exceeded; record skipped keys like sampling; gate treats skips as neither pass nor fail; optional per-cell `timeout_s` later (ADOPT-006) | ADOPT-006 |
 | 6.11    | [ ] **Bench report compare (product)** — diff two `*_matrix.json` (cell pass flips, per-profile totals). Conventions: [bench-analysis.md](../../guides/bench-analysis.md) | — |
 | 6.12    | [ ] **Run summary: failure taxonomy + flaky count (product)** — stderr or report metadata on `run` exit. Conventions: [bench-analysis.md](../../guides/bench-analysis.md) | — |
-| 6.13    | [ ] **Doc debt:** refresh [architecture-vision.md](architecture-vision.md) phased table + snippets (`agent-eval`, split workflows); align [adoption-usability-backlog.md](../research/adoption-usability-backlog.md) voice; optional consolidated exit block in checklist (vs [CLAUDE.md](../../../CLAUDE.md)) | — |
 
 
 **6.8 evidence:** OpenCrabs `hashline-bench` (MiniMax) lost 2/50 cells to 429 — [dogfood-notes](../research/dogfood-notes.md). Bench matrices and CI full runs need transport-level retries so failures are not misread as model/tool regressions.
@@ -264,20 +257,22 @@ gategrid gate --matrix examples/gategrid/matrices/ci-gate-mock.yaml --root examp
 
 ---
 
-## Priority order (post–framework v1)
+## Priority order (single-threaded)
 
-Phases **0–5** and Spike C + legacy teardown are complete. Suggested single-threaded order:
+Fastest path to the **wedge** (run + gate in CI), then MCP, then polish:
 
 
-| Order | Track | Outcome |
-| ----- | ----- | ------- |
-| 1 | **Spike B** (ai-antispam) | Classifier gate + `evals/` layout |
-| 2 | **Spike A** (fast-mcp-telegram) | MCP matrix + GH workflows |
-| 3 | **R.1** PyPI | `pip install gategrid` |
-| 4 | **Phase 6** picks | HTML report, concurrency, rate limits ([6.8](#phase-6--post-v1-defer)), doc debt ([6.13](#phase-6--post-v1-defer)) |
-| 5 | **D.8** | Go / no-go vs [success criteria](#success--kill-criteria-personal) |
+| Order | Phases               | Outcome                                                     |
+| ----- | -------------------- | ----------------------------------------------------------- |
+| 1     | **1** ✓, **2** ✓     | `gategrid run` (legacy stays in-tree for OpenCrabs)         |
+| 2     | **3**                | `@evaluator` + `contrib/file_edit` → OpenCrabs spike viable |
+| 3     | **5.3–5.4, 5.7–5.9** | CI gate + baseline story                                    |
+| 4     | **5.5, 2.5**         | PR sampling + flakes (if not done in 2)                     |
+| 5     | **4**                | MCP example                                                 |
+| 6     | **3.5, 6.x**         | contrib polish + HTML report                                |
 
-Do **not** port file-edit into core; use **contrib** + spikes for domain evals.
+
+Do **not** prioritize porting file-edit into core; prioritize **2 → 3.4 → Spike C**.
 
 ---
 
@@ -363,9 +358,12 @@ evals/
 | #   | Task                                                                                                                  |
 | --- | --------------------------------------------------------------------------------------------------------------------- |
 | L.1 | [x] Remove `src/agent_eval_matrix/` and legacy harness tests                                                          |
-| L.2 | [x] Remove `experiments/` (content in [`examples/opencrabs/`](../../../examples/opencrabs/) / `contrib`)               |
+| L.2 | [x] Remove [experiments/](../../experiments/) (content in `examples/opencrabs/` / `contrib`)                          |
 | L.3 | [x] Switch `.github/workflows/` to Gategrid-only ([gategrid-ci.yml](../../../.github/workflows/gategrid-ci.yml))              |
 | L.4 | [x] Update README, [CLAUDE.md](../../../CLAUDE.md) — no legacy run commands                                              |
+
+
+Until L.*: monorepo may run legacy via `PYTHONPATH=src` + `uv sync --extra pydantic-ai` for hashline parity vs Gategrid.
 
 ### Spike B — ai-antispam (2nd)
 
@@ -430,5 +428,5 @@ evals/
 | --- | -------------------------------------------------------------------------------------------------------------------------- |
 | R.1 | [ ] Reserve `gategrid` on PyPI                                                                                             |
 | R.2 | [x] README product = Gategrid                                                                                              |
-| R.3 | [x] `.gategrid/` only for Gategrid runtime + examples (historical `agent-eval-matrix` mentions OK in competitive docs / ADRs) |
+| R.3 | [ ] `.gategrid/` only — no `.agent-eval-matrix/`                                                                           |
 | R.4 | [x] Delete legacy package + experiments ([L.1–L.2](#legacy-teardown-after-spike-c)) |

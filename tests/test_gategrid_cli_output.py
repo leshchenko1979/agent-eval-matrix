@@ -130,6 +130,37 @@ def test_cli_run_subprocess_smoke_line(tmp_path: Path) -> None:
     assert "run: OK" in proc.stdout
 
 
+def test_cli_run_model_override_warning_subprocess(tmp_path: Path) -> None:
+    import os
+
+    home = tmp_path / ".gategrid"
+    env = os.environ.copy()
+    env["GATEGRID_HOME"] = str(home)
+    env["PYTHONPATH"] = str(REPO_ROOT / "src")
+    env["GATEGRID_EVAL_ROOT"] = str(REPO_ROOT / "examples" / "gategrid")
+    matrix = REPO_ROOT / "examples/gategrid/matrices/ci-gate-mock.yaml"
+    proc = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "gategrid.cli",
+            "run",
+            "--matrix",
+            str(matrix),
+            "--root",
+            str(REPO_ROOT / "examples" / "gategrid"),
+            "--model",
+            "mock",
+        ],
+        cwd=REPO_ROOT,
+        env=env,
+        capture_output=True,
+        text=True,
+    )
+    assert proc.returncode == 0, proc.stderr + proc.stdout
+    assert "warning: --model override" in proc.stderr
+
+
 def test_cli_run_case_filter_warning_subprocess(tmp_path: Path) -> None:
     import os
 

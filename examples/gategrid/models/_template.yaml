@@ -1,0 +1,14 @@
+# Copy to models/<your-id>.yaml and reference with: gategrid run --model <your-id>
+#
+# provider: mock | openai | anthropic | google
+# model_name: API model id
+# api_key_env: ENV var holding the secret (values never go in YAML)
+# base_url: required for provider openai; optional for anthropic/google (OpenAI-compatible hosts)
+#
+# Env overrides (same preset id): {PREFIX}_MODEL and {PREFIX}_BASE_URL
+# derived from api_key_env (e.g. MINIMAX_API_KEY -> MINIMAX_MODEL).
+
+provider: openai
+model_name: gpt-4o-mini
+base_url: https://api.openai.com/v1
+api_key_env: OPENAI_API_KEY

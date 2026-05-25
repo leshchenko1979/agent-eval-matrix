@@ -2,11 +2,11 @@
 
 **Matrix evaluation for LLM agents — pytest for your cases, codecov for your regressions.**
 
-`pip install gategrid` · Python ≥3.11 · [Architecture](architecture-vision.md)
+`pip install gategrid` · Python ≥3.11 · [Architecture](../engineering/architecture-vision.md)
 
-> **Canonical product page:** [README.md](../../README.md) — problem, gate vs benchmark, quick start, case study. **This file** is extended GTM: full gate YAML, sampling, MCP, positioning tables.
+> **Canonical product page:** [README.md](../../../README.md) — problem, gate vs benchmark, quick start, case study. **This file** is extended GTM: full gate YAML, sampling, MCP, positioning tables.
 
-**Go-to-market docs:** [Competitive landscape](competitive-landscape.md) · [Battlecard vs promptfoo / DeepEval](battlecard.md) · [v1 build checklist](v1-implementation-checklist.md)
+**Go-to-market docs:** [Competitive landscape](competitive-landscape.md) · [Battlecard vs promptfoo / DeepEval](battlecard.md) · [Spike DX analysis](../research/spike-dx-competitive-analysis.md) · [v1 build checklist](../engineering/v1-implementation-checklist.md)
 
 ---
 
@@ -161,6 +161,8 @@ gategrid baseline update --from-report .gategrid/reports/latest.json
 
 ### 3. Cost control: randomized sampling (PR)
 
+Operator guide: [docs/guides/ci.md](../../guides/ci.md) (`run.sample`, PR vs `main`, like-for-like on samples). Example matrix: [examples/gategrid/matrices/ci-gate-pr-mock.yaml](../../../examples/gategrid/matrices/ci-gate-pr-mock.yaml).
+
 Sampling only shrinks **how many cases** run; it does **not** change the profile. Skipped cells are omitted from aggregates, not counted as pass.
 
 - **Like-for-like** = keys in both this report and `baselines/mcp-candidate.json`.
@@ -247,13 +249,13 @@ Python ≥3.11. Secrets via environment only.
 
 | Still on roadmap | Notes |
 | ---------------- | ----- |
-| `gategrid init`, HTML report, rate-limit retries | [v1 checklist](v1-implementation-checklist.md) Phase 6 |
-| Spikes B / A (ai-antispam, fast-mcp-telegram) | [dogfood-notes](dogfood-notes.md) |
+| `gategrid init`, HTML report, rate-limit retries | [v1 checklist](../engineering/v1-implementation-checklist.md) Phase 6 |
+| Spikes B / A (ai-antispam, fast-mcp-telegram) | [dogfood-notes](../research/dogfood-notes.md) |
 
-Design: [architecture-vision.md](architecture-vision.md). Operator setup: [CLAUDE.md](../../CLAUDE.md).
+Design: [architecture-vision.md](../engineering/architecture-vision.md). Operator setup: [CLAUDE.md](../../../CLAUDE.md).
 
 ---
 
 ## License
 
-See [LICENSE](../../LICENSE) in the repository.
+See [LICENSE](../../../LICENSE) in the repository.

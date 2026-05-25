@@ -21,8 +21,8 @@ FILE_EDIT_EXAMPLE = REPO_ROOT / "examples/file_edit"
 
 
 def test_discover_cases_without_eval_cases_package() -> None:
-    """OpenCrabs example uses builtin batteries; cases/yaml/ is doc-only (no cases/__init__.py)."""
-    assert not (OPENCRABS_ROOT / "cases" / "__init__.py").is_file()
+    """OpenCrabs example uses builtin batteries; no eval-root cases/ package."""
+    assert not (OPENCRABS_ROOT / "cases").exists()
     registry = discover_cases(OPENCRABS_ROOT)
     assert "indent_collision" in registry
     assert len(registry) >= 10

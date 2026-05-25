@@ -227,7 +227,7 @@ agent-eval run --matrix matrices/pr.yaml --sample-max-cells 20 --sample-share 0.
 **Gate notes:**
 
 - Regression / limits apply to aggregates on executed cells (overall) and LFL subset as today.
-- Optional `gate.min_like_for_like_cells` — warn or fail if intersection is too small to trust (e.g. sample too thin).
+- `gate.regression.min_like_for_like_share` — fail if LFL intersection share vs baseline is below minimum (default 1.0 when `bounds.like_for_like` is set; see [docs/guides/ci.md](../../guides/ci.md)).
 - Do not treat skipped cells as passes or failures.
 
 **Typical cadence:**
@@ -587,10 +587,10 @@ class Evaluator:
 
 ## See also
 
-- [README-pitch-draft.md](./README-pitch-draft.md) — Gategrid product pitch (target README)
-- [competitive-landscape.md](./competitive-landscape.md) — market map + product naming
-- [battlecard.md](./battlecard.md) — vs promptfoo / DeepEval
-- [v1-implementation-checklist.md](./v1-implementation-checklist.md) — phased build checklist
-- [dogfood-notes.md](./dogfood-notes.md) — spike diary (fast-mcp-telegram, ai-antispam, opencrabs)
-- [adoption-usability-backlog.md](./adoption-usability-backlog.md) — CLI, CI Action, HTML reports
+- [README-pitch-draft.md](../product/README-pitch-draft.md) — Gategrid product pitch (target README)
+- [competitive-landscape.md](../product/competitive-landscape.md) — market map + product naming
+- [battlecard.md](../product/battlecard.md) — vs promptfoo / DeepEval
+- [v1-implementation-checklist.md](v1-implementation-checklist.md) — phased build checklist
+- [dogfood-notes.md](../research/dogfood-notes.md) — spike diary (fast-mcp-telegram, ai-antispam, opencrabs)
+- [adoption-usability-backlog.md](../research/adoption-usability-backlog.md) — CLI, CI Action, HTML reports
 - **ADR** (Architecture Decision Record): short frozen note per decision (`docs/adr/0001-….md`) when implementing Phase 0

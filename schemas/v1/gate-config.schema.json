@@ -57,6 +57,18 @@
           "description": "Keys: overall, like_for_like",
           "title": "Bounds",
           "type": "object"
+        },
+        "min_like_for_like_share": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Min Like For Like Share"
         }
       },
       "required": [

@@ -24,6 +24,7 @@ from gategrid.evaluators import (
     run_evaluators_on_artifact,
 )
 from gategrid.fingerprint import build_fingerprint
+from gategrid.sampling import select_cell_keys
 from gategrid.io import load_matrix_config, load_yaml_model, save_json
 from gategrid.models.artifact import RunArtifact
 from gategrid.models.cell import AttemptRecord, CellKey, CellResult
@@ -34,7 +35,7 @@ from gategrid.models.profile_config import ProfileConfig
 from gategrid.models.report import MatrixReport, SamplingMeta
 from gategrid.paths import reports_dir
 from gategrid.runtime import RunContext, load_runtime_adapter
-from gategrid.validate import resolve_eval_root, validate_matrix
+from gategrid.validate import effective_model_ids, resolve_eval_root, validate_matrix
 
 
 @dataclass
@@ -104,12 +105,18 @@ async def run_matrix(
     *,
     eval_root: Path | None = None,
     case_filter: str | None = None,
+    model_filter: list[str] | None = None,
 ) -> RunOutcome:
     matrix_path = matrix_path.resolve()
     root = resolve_eval_root(matrix_path, eval_root)
     _ensure_eval_root_on_path(root)
 
-    validation = validate_matrix(matrix_path, root=root, emit_conventions=False)
+    validation = validate_matrix(
+        matrix_path,
+        root=root,
+        emit_conventions=False,
+        model_filter=model_filter,
+    )
     if not validation.ok:
         raise MatrixRunError(validation.errors)
 
@@ -150,48 +157,82 @@ async def run_matrix(
                 f"unknown case id {cid!r}; registered: {known or '(none)'}"
             )
 
+    model_ids = effective_model_ids(matrix, model_filter)
     profiles = _load_profiles(matrix, root)
-    models = _load_models(matrix, root)
+    models = _load_models(model_ids, root)
     adapters = _load_profile_adapters(profiles)
 
     max_retries = matrix.run.max_retries
-    cells: list[CellResult] = []
-    planned = len(case_ids) * len(matrix.profiles) * len(matrix.models)
+    matrix_name = matrix.name or matrix_path.stem
 
+    all_keys: list[CellKey] = []
     for case_id in case_ids:
-        record = case_registry[case_id]
         for profile_id in matrix.profiles:
-            for model_id in matrix.models:
-                cell = await _run_cell(
-                    case_id=case_id,
-                    record=record,
-                    profile_id=profile_id,
-                    model_id=model_id,
-                    eval_root=root,
-                    profile=profiles[profile_id],
-                    model=models[model_id],
-                    adapter=adapters[profile_id],
-                    max_retries=max_retries,
-                    gates=gates,
-                    metrics=metric_evals,
+            for model_id in model_ids:
+                all_keys.append(
+                    CellKey(
+                        case_id=case_id,
+                        profile_id=profile_id,
+                        model_id=model_id,
+                    )
                 )
-                cells.append(cell)
+
+    sample_cfg = matrix.run.sample
+    if sample_cfg is not None:
+        plan = select_cell_keys(all_keys, case_registry, sample_cfg)
+        keys_to_run = plan.selected_keys
+        skipped_keys = plan.skipped_keys
+        sampling_meta = SamplingMeta(
+            sampled=True,
+            seed=plan.seed,
+            max_cells=sample_cfg.max_cells,
+            share=sample_cfg.share,
+            always_include_tags=list(sample_cfg.always_include_tags),
+            planned_cells=len(all_keys),
+            executed_cells=len(keys_to_run),
+            skipped_cells=skipped_keys,
+        )
+    else:
+        keys_to_run = all_keys
+        sampling_meta = SamplingMeta(
+            sampled=False,
+            planned_cells=len(all_keys),
+            executed_cells=len(all_keys),
+        )
+
+    cells: list[CellResult] = []
+    for key in keys_to_run:
+        record = case_registry[key.case_id]
+        cell = await _run_cell(
+            case_id=key.case_id,
+            record=record,
+            profile_id=key.profile_id,
+            model_id=key.model_id,
+            eval_root=root,
+            profile=profiles[key.profile_id],
+            model=models[key.model_id],
+            adapter=adapters[key.profile_id],
+            max_retries=max_retries,
+            gates=gates,
+            metrics=metric_evals,
+        )
+        cells.append(cell)
 
     mean_keys = metric_keys_from_gate(matrix.gate)
     overall = compute_overall(cells, mean_keys=mean_keys)
-    matrix_name = matrix.name or matrix_path.stem
     timestamp = datetime.now(UTC).isoformat()
     report = MatrixReport(
         timestamp=timestamp,
         matrix_path=str(matrix_path),
         matrix_name=matrix_name,
         commit_sha=os.environ.get("GITHUB_SHA", "local"),
-        fingerprint=build_fingerprint(matrix_name, cells),
-        sampling=SamplingMeta(
-            sampled=False,
-            planned_cells=planned,
-            executed_cells=len(cells),
+        fingerprint=build_fingerprint(
+            matrix_name,
+            cells,
+            case_ids=case_ids,
+            profile_ids=list(matrix.profiles),
         ),
+        sampling=sampling_meta,
         run_max_retries=max_retries,
         cells=cells,
         overall=overall,
@@ -208,9 +249,15 @@ def run_matrix_sync(
     *,
     eval_root: Path | None = None,
     case_filter: str | None = None,
+    model_filter: list[str] | None = None,
 ) -> RunOutcome:
     return asyncio.run(
-        run_matrix(matrix_path, eval_root=eval_root, case_filter=case_filter)
+        run_matrix(
+            matrix_path,
+            eval_root=eval_root,
+            case_filter=case_filter,
+            model_filter=model_filter,
+        )
     )
 
 
@@ -222,9 +269,9 @@ def _load_profiles(matrix: MatrixConfig, eval_root: Path) -> dict[str, ProfileCo
     return out
 
 
-def _load_models(matrix: MatrixConfig, eval_root: Path) -> dict[str, ModelConfig]:
+def _load_models(model_ids: list[str], eval_root: Path) -> dict[str, ModelConfig]:
     out: dict[str, ModelConfig] = {}
-    for model_id in matrix.models:
+    for model_id in model_ids:
         path = eval_root / "models" / f"{model_id}.yaml"
         out[model_id] = load_yaml_model(path, ModelConfig)
     return out

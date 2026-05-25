@@ -12,7 +12,7 @@ from gategrid.gate import run_gate
 from gategrid.io import load_baseline, load_report, save_json
 from gategrid.models.artifact import RunArtifact
 from gategrid.models.baseline import Baseline
-from gategrid.models.cell import CellResult
+from gategrid.models.cell import CellKey, CellResult
 from gategrid.models.gate_config import (
     GateConfig,
     GateLimits,
@@ -135,6 +135,91 @@ def test_gate_metric_mean_min_and_max() -> None:
     names = {c.name for c in outcome.checks}
     assert "limits.overall.accuracy_min" in names
     assert "limits.overall.turns_max" in names
+
+
+def _lfl_gate_config(
+    *,
+    min_share: float | None = None,
+) -> GateConfig:
+    regression = GateRegression(
+        baseline="telegram-mcp-stdio",
+        bounds={
+            "like_for_like": RegressionBounds(pass_rate_min_delta=-0.5),
+        },
+    )
+    if min_share is not None:
+        regression.min_like_for_like_share = min_share
+    return GateConfig(baseline="telegram-mcp-stdio", regression=regression)
+
+
+def test_gate_like_for_like_intersection_share_full() -> None:
+    report = sample_report()
+    baseline = report_to_baseline(
+        report, "telegram-mcp-stdio", mean_keys={"turns", "tokens_spent"}
+    )
+    outcome = run_gate(report, baseline, _lfl_gate_config())
+    assert outcome.passed
+    assert any(
+        c.name == "regression.like_for_like.intersection_share" and c.passed
+        for c in outcome.checks
+    )
+
+
+def test_gate_like_for_like_intersection_share_empty_fails() -> None:
+    report = sample_report()
+    baseline = report_to_baseline(
+        report, "telegram-mcp-stdio", mean_keys={"turns", "tokens_spent"}
+    )
+    for cell in report.cells:
+        cell.key = CellKey(
+            case_id="unbaselined_case",
+            profile_id="telegram-mcp-stdio",
+            model_id="gpt-4o-mini",
+        )
+    outcome = run_gate(report, baseline, _lfl_gate_config())
+    assert not outcome.passed
+    share_check = next(
+        c
+        for c in outcome.checks
+        if c.name == "regression.like_for_like.intersection_share"
+    )
+    assert not share_check.passed
+    assert "0/2 cells" in share_check.message
+
+
+def test_gate_like_for_like_intersection_share_below_min_fails() -> None:
+    report = sample_report()
+    baseline = report_to_baseline(
+        report, "telegram-mcp-stdio", mean_keys={"turns", "tokens_spent"}
+    )
+    report.cells = report.cells[:1]
+    outcome = run_gate(report, baseline, _lfl_gate_config(min_share=0.75))
+    assert not outcome.passed
+    share_check = next(
+        c
+        for c in outcome.checks
+        if c.name == "regression.like_for_like.intersection_share"
+    )
+    assert not share_check.passed
+
+
+def test_gate_like_for_like_intersection_share_default_min_is_one() -> None:
+    report = sample_report()
+    baseline = report_to_baseline(
+        report, "telegram-mcp-stdio", mean_keys={"turns", "tokens_spent"}
+    )
+    report.cells = report.cells[:1]
+    outcome = run_gate(report, baseline, _lfl_gate_config())
+    assert not outcome.passed
+
+
+def test_gate_regression_min_like_for_like_share_invalid() -> None:
+    with pytest.raises(ValueError, match="min_like_for_like_share"):
+        GateRegression(
+            baseline="p",
+            min_like_for_like_share=1.5,
+            bounds={"like_for_like": RegressionBounds()},
+        )
 
 
 def test_cli_run_not_ready() -> None:

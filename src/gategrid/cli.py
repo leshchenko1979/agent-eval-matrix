@@ -14,18 +14,20 @@ from gategrid.cli_output import (
 from gategrid.executor import MatrixRunError, run_matrix_sync
 from gategrid.gate import run_gate
 from gategrid.io import load_baseline, load_matrix_config, load_report
-from gategrid.paths import baseline_path, reports_dir
+from gategrid.paths import reports_dir, resolve_baseline_file
 from gategrid.validate import validate_matrix
 
 
 def _cmd_run(args: argparse.Namespace) -> int:
     matrix_path = Path(args.matrix)
     root = Path(args.root) if args.root else None
+    model_filter = args.model or None
     try:
         outcome = run_matrix_sync(
             matrix_path,
             eval_root=root,
             case_filter=args.case,
+            model_filter=model_filter,
         )
     except MatrixRunError as exc:
         print(format_matrix_run_errors(exc.errors), file=sys.stderr)
@@ -34,11 +36,16 @@ def _cmd_run(args: argparse.Namespace) -> int:
         print(format_matrix_run_errors([str(exc)]), file=sys.stderr)
         return 2
 
+    matrix_yaml_models: list[str] | None = None
+    if model_filter:
+        matrix_yaml_models = list(load_matrix_config(matrix_path).models)
     print_run_outcome(
         outcome,
         matrix_path=matrix_path,
         eval_root=root,
         case_filter=args.case,
+        model_filter=model_filter,
+        matrix_yaml_models=matrix_yaml_models,
         verbose=args.verbose,
     )
     if all(c.passed for c in outcome.report.cells):
@@ -65,9 +72,18 @@ def _cmd_gate(args: argparse.Namespace) -> int:
         print("profile required: --profile or matrix gate.baseline", file=sys.stderr)
         return 2
 
-    baseline_file = Path(args.baseline) if args.baseline else baseline_path(profile_id)
-    if not baseline_file.is_file():
-        print(f"baseline not found: {baseline_file}", file=sys.stderr)
+    try:
+        baseline_file = resolve_baseline_file(
+            profile_id,
+            baseline=Path(args.baseline) if args.baseline else None,
+            baseline_from_artifact=(
+                Path(args.baseline_from_artifact)
+                if args.baseline_from_artifact
+                else None
+            ),
+        )
+    except (FileNotFoundError, ValueError) as exc:
+        print(str(exc), file=sys.stderr)
         return 2
 
     gate_config = config
@@ -113,6 +129,7 @@ def _cmd_validate(args: argparse.Namespace) -> int:
         Path(args.matrix),
         root=root,
         emit_conventions=args.verbose,
+        model_filter=args.model or None,
     )
     if outcome.ok:
         print("validate: OK")
@@ -124,9 +141,11 @@ def _cmd_validate(args: argparse.Namespace) -> int:
 
 
 def _cmd_baseline_update(args: argparse.Namespace) -> int:
+    matrix_path = Path(args.matrix) if args.matrix else None
     path = update_baseline_from_report(
         Path(args.from_report),
         args.profile,
+        matrix_path=matrix_path,
     )
     print(f"baseline updated: {path}")
     return 0
@@ -151,6 +170,8 @@ artifacts live under .gategrid/ (or GATEGRID_HOME).
   run        execute cases × profiles × models
   gate       compare a report to a baseline
   baseline   write baselines from reports
+
+run/validate --model <id> overrides matrix models (preset under eval_root/models/).
 
 Put -v/--verbose before the subcommand for case/evaluator id hints on stderr.
 """
@@ -181,6 +202,12 @@ def main(argv: list[str] | None = None) -> int:
         "--root",
         help="eval project root (default: GATEGRID_EVAL_ROOT or parent of matrices/)",
     )
+    val_p.add_argument(
+        "--model",
+        action="append",
+        metavar="ID",
+        help="override matrix models with these preset id(s) from eval_root/models/",
+    )
     val_p.set_defaults(func=_cmd_validate)
 
     run_p = sub.add_parser("run", help="run matrix eval grid")
@@ -193,14 +220,25 @@ def main(argv: list[str] | None = None) -> int:
         "--case",
         help="run a single case id only (partial matrix; gate fingerprint caveat)",
     )
+    run_p.add_argument(
+        "--model",
+        action="append",
+        metavar="ID",
+        help="override matrix models with these preset id(s) from eval_root/models/",
+    )
     run_p.set_defaults(func=_cmd_run)
 
     gate_p = sub.add_parser("gate", help="compare report to baseline")
     gate_p.add_argument(
         "--report", help="report JSON (default: latest in .gategrid/reports)"
     )
-    gate_p.add_argument(
+    baseline_group = gate_p.add_mutually_exclusive_group()
+    baseline_group.add_argument(
         "--baseline", help="baseline JSON (default: .gategrid/baselines/<profile>.json)"
+    )
+    baseline_group.add_argument(
+        "--baseline-from-artifact",
+        help="directory or file from CI artifact (baselines/<profile>.json or <profile>.json)",
     )
     gate_p.add_argument("--matrix", help="matrix YAML for gate config")
     gate_p.add_argument(
@@ -213,6 +251,14 @@ def main(argv: list[str] | None = None) -> int:
     update_p = base_sub.add_parser("update", help="write baseline from report")
     update_p.add_argument("--from-report", required=True)
     update_p.add_argument("--profile", required=True)
+    update_p.add_argument(
+        "--matrix",
+        help="matrix YAML for gate metric keys in baseline overall.metrics",
+    )
+    update_p.add_argument(
+        "--root",
+        help="eval project root (unused for update; reserved for parity with run/gate)",
+    )
     update_p.set_defaults(func=_cmd_baseline_update)
 
     args = parser.parse_args(argv)

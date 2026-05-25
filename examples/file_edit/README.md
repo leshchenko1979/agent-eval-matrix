@@ -22,4 +22,12 @@ uv run gategrid validate --matrix matrices/smoke-mock.yaml --root .
 uv run gategrid run --matrix matrices/smoke-mock.yaml --root .
 ```
 
+## Using another model
+
+Copy a preset from [examples/gategrid/models/_template.yaml](../gategrid/models/_template.yaml) into `models/<id>.yaml`, then override without editing the matrix:
+
+```bash
+uv run gategrid run --matrix matrices/smoke-mock.yaml --root . --model <id>
+```
+
 Set `GATEGRID_EVAL_ROOT` to this directory when invoking from the repo root.

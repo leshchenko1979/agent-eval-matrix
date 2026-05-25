@@ -8,7 +8,10 @@ from typing import Any
 
 from pydantic_ai import Tool
 
-from gategrid.integrations.pydantic_ai.tools import load_tool_function, resolve_eval_path
+from gategrid.integrations.pydantic_ai.tools import (
+    load_tool_function,
+    resolve_eval_path,
+)
 
 _BUILTIN_TOOLS: dict[str, Callable[..., object]] = {}
 _BUILTIN_LOADED = False
@@ -33,8 +36,12 @@ def _ensure_builtin_tools_loaded() -> None:
     global _BUILTIN_LOADED
     if _BUILTIN_LOADED:
         return
-    import gategrid.contrib.file_edit.bundled  # noqa: F401
+    import gategrid.contrib.file_edit.bundled  # noqa: F401 — cases only
+    from gategrid.contrib.file_edit.bundled.tools_register import (
+        register_bundled_tools,
+    )
 
+    register_bundled_tools()
     _BUILTIN_LOADED = True
 
 

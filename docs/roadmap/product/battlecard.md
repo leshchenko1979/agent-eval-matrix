@@ -2,7 +2,7 @@
 
 **Audience:** engineering leads, platform/QA, MCP/agent maintainers evaluating CI eval tooling.
 
-**Us:** [Gategrid](README-pitch-draft.md) — matrix runner + **git-native regression gate** for **one profile per CI lane**. Full landscape: [competitive-landscape.md](competitive-landscape.md).
+**Us:** [Gategrid](README-pitch-draft.md) — matrix runner + **git-native regression gate** for **one profile per CI lane**. Full landscape: [competitive-landscape.md](competitive-landscape.md). Per-spike DX evidence: [spike-dx-competitive-analysis.md](../research/spike-dx-competitive-analysis.md) (OpenCrabs: bench orchestration may be lighter in promptfoo / pydantic-evals; **gate** is our wedge).
 
 **Last updated:** 2026-05-24
 
@@ -72,8 +72,8 @@
 
 | Objection | Response |
 | --------- | -------- |
-| “We already use promptfoo.” | Keep promptfoo for prompt sweeps and red team; use Gategrid for **one gated agent profile** and **repo baselines** if YAML+JS doesn’t match your runtime. |
-| “DeepEval is pytest.” | DeepEval scores **outputs**; Gategrid orchestrates **cases × profiles × models** and **merge gates** on aggregates. Composable: DeepEval metrics inside our `@evaluator`. |
+| “We already use promptfoo.” | Keep promptfoo for prompt sweeps and red team; use Gategrid for **one gated agent profile** and **repo baselines** if YAML+JS doesn’t match your runtime. For **bench-only** matrices, promptfoo may be faster to wire — see [OpenCrabs DX analysis](../research/spike-dx-competitive-analysis.md#spike-c--opencrabs-retroactive-2026-05). |
+| “DeepEval is pytest.” | DeepEval scores **outputs**; Gategrid orchestrates **cases × profiles × models** and **merge gates** on aggregates. Composable: DeepEval metrics inside our `@evaluator`. Poor fit for multi-turn **tool + file** E2E (OpenCrabs-shaped spikes). |
 | “We use LangSmith experiments.” | LangSmith stores baselines in cloud; Gategrid stores golden runs in **`.gategrid/baselines/`** for fork/PR workflows without vendor lock-in. |
 | “Too early / no stars.” | Wedge is narrow on purpose; adopt for **one MCP gate matrix** before betting the whole eval program. |
 | “LLMs are flaky.” | v1: cell retries + `flaky_suspect`; gate uses aggregates and deltas, not single deterministic runs. |
@@ -88,7 +88,7 @@
 | Committed `baselines/mcp-candidate.json` + PR `--baseline-from-artifact` | DeepEval-only cloud regression |
 | File-edit example ported on `RuntimeAdapter` | “Coupled to pydantic-ai” perception |
 
-Checklist: [v1-implementation-checklist.md](v1-implementation-checklist.md).
+Checklist: [v1-implementation-checklist.md](../engineering/v1-implementation-checklist.md).
 
 ---
 

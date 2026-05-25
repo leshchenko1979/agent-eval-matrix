@@ -7,8 +7,6 @@ from pathlib import Path
 
 from gategrid.cases import register_builtin_case_set
 from gategrid.contrib.file_edit.cases import register_builtin_case_from_yaml
-from gategrid.contrib.file_edit.tools import register_builtin_tool
-from gategrid.contrib.file_edit.bundled.tooling import baseline
 
 _HASHLINE_CASE_IDS = [
     "whitespace_trap",
@@ -46,13 +44,4 @@ def _register_bundled_cases() -> None:
     register_builtin_case_set("hashline_hypotheses", [str(c) for c in cases])
 
 
-def _register_bundled_tools() -> None:
-    register_builtin_tool("ls", baseline.ls)
-    register_builtin_tool("glob", baseline.glob_tool)
-    register_builtin_tool("grep", baseline.grep)
-    register_builtin_tool("read_file", baseline.read_file)
-    register_builtin_tool("str_replace", baseline.str_replace)
-
-
 _register_bundled_cases()
-_register_bundled_tools()

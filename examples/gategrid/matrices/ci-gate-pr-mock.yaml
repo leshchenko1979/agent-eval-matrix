@@ -1,0 +1,26 @@
+name: ci-gate-pr-mock
+profiles:
+  - demo
+models:
+  - mock
+case_sets:
+  - demo
+run:
+  sample:
+    max_cells: 2
+    share: 0.5
+    seed: 0
+    always_include_tags: [smoke]
+gate:
+  baseline: demo
+  regression:
+    baseline: demo
+    # PR sample may cover a subset of baseline cells; require >=50% overlap.
+    min_like_for_like_share: 0.5
+    bounds:
+      like_for_like:
+        pass_rate_min_delta: -0.05
+        max_regressed_cells: 1
+  limits:
+    overall:
+      pass_rate_min: 0.5

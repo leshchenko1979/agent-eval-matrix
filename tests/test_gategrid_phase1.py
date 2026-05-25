@@ -9,6 +9,7 @@ import pytest
 from gategrid.cli import main
 from gategrid.io import save_json
 from gategrid.paths import baselines_dir, gategrid_home, reports_dir, traces_dir
+from gategrid.executor import run_matrix_sync
 from gategrid.validate import resolve_eval_root, validate_matrix
 from gategrid.version import __version__
 from gategrid.fixtures.sample import sample_report
@@ -31,6 +32,19 @@ def test_validate_smoke_example() -> None:
     assert main(["validate", "--matrix", str(SMOKE_MATRIX)]) == 0
 
 
+def test_validate_model_override_mock() -> None:
+    assert main(["validate", "--matrix", str(SMOKE_MATRIX), "--model", "mock"]) == 0
+
+
+def test_validate_unknown_model_lists_available() -> None:
+    outcome = validate_matrix(
+        SMOKE_MATRIX,
+        model_filter=["not-a-real-model"],
+    )
+    assert not outcome.ok
+    assert any("available models:" in e for e in outcome.errors)
+
+
 def test_validate_reports_missing_refs(tmp_path: Path) -> None:
     root = tmp_path / "eval"
     (root / "matrices").mkdir(parents=True)
@@ -47,6 +61,18 @@ def test_validate_reports_missing_refs(tmp_path: Path) -> None:
     assert not outcome.ok
     assert any("profile" in e for e in outcome.errors)
     assert any("model" in e for e in outcome.errors)
+
+
+def test_run_model_override_uses_mock_cells() -> None:
+    root = REPO_ROOT / "examples/gategrid"
+    mcp_matrix = root / "matrices/mcp-gate-mock.yaml"
+    outcome = run_matrix_sync(
+        mcp_matrix,
+        eval_root=root,
+        model_filter=["mock"],
+    )
+    assert outcome.report.cells
+    assert all(c.key.model_id == "mock" for c in outcome.report.cells)
 
 
 def test_resolve_eval_root_from_matrices_dir() -> None:

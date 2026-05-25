@@ -8,13 +8,17 @@ from gategrid.models.report import ReportFingerprint
 def build_fingerprint(
     matrix_name: str,
     cells: list[CellResult],
+    *,
+    case_ids: list[str] | None = None,
+    profile_ids: list[str] | None = None,
 ) -> ReportFingerprint:
-    profile_ids = sorted({c.key.profile_id for c in cells})
-    case_ids = sorted({c.key.case_id for c in cells})
+    """Build fingerprint from cells or explicit matrix axes (full grid when sampling)."""
+    resolved_profiles = profile_ids or sorted({c.key.profile_id for c in cells})
+    resolved_cases = case_ids or sorted({c.key.case_id for c in cells})
     return ReportFingerprint(
         matrix_name=matrix_name,
-        profile_ids=profile_ids,
-        case_ids=case_ids,
+        profile_ids=sorted(resolved_profiles),
+        case_ids=sorted(resolved_cases),
     )
 
 

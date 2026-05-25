@@ -3,6 +3,6 @@
 from gategrid import case
 
 
-@case
+@case(tags=["smoke"])
 def hello_world() -> None:
     """Registered for matrix / case_set references."""

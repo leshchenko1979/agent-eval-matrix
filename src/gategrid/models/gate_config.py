@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 
 class RegressionBounds(BaseModel):
@@ -23,6 +23,24 @@ class GateRegression(BaseModel):
         default_factory=dict,
         description="Keys: overall, like_for_like",
     )
+    min_like_for_like_share: float | None = Field(
+        default=None,
+        description=(
+            "Min fraction of baseline cells in like-for-like intersection "
+            "(0, 1]; default 1.0 when bounds.like_for_like is set"
+        ),
+    )
+
+    @model_validator(mode="after")
+    def validate_min_like_for_like_share(self) -> GateRegression:
+        if self.min_like_for_like_share is None:
+            return self
+        share = self.min_like_for_like_share
+        if not (0.0 < share <= 1.0):
+            raise ValueError(
+                "gate.regression.min_like_for_like_share must be in (0, 1]"
+            )
+        return self
 
 
 class GateConfig(BaseModel):

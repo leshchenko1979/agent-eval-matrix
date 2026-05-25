@@ -107,9 +107,7 @@ def _check_regression_bounds(
                 ),
             )
         )
-    checks.extend(
-        _check_metric_regression_bounds(name, current, baseline, bounds)
-    )
+    checks.extend(_check_metric_regression_bounds(name, current, baseline, bounds))
     return checks
 
 
@@ -219,7 +217,24 @@ def run_gate(
             )
 
         if lfk_bounds := bounds.get("like_for_like"):
-            if like_cells:
+            baseline_n = len(baseline.cells)
+            share = len(lfk) / baseline_n if baseline_n else 0.0
+            min_share = config.regression.min_like_for_like_share
+            if min_share is None:
+                min_share = 1.0
+            share_ok = share >= min_share
+            checks.append(
+                GateCheckResult(
+                    name="regression.like_for_like.intersection_share",
+                    passed=share_ok,
+                    message=(
+                        f"like_for_like share {share:.4f} "
+                        f"(min {min_share:.4f}, {len(lfk)}/{baseline_n} cells)"
+                    ),
+                )
+            )
+
+            if like_cells and share_ok:
                 like_overall = compute_overall(like_cells)
                 baseline_like_cells = _baseline_snapshots_as_results(
                     baseline, like_cells
@@ -233,8 +248,6 @@ def run_gate(
                         lfk_bounds,
                     )
                 )
-            else:
-                warnings.append("like_for_like: empty intersection with baseline")
 
             max_reg = lfk_bounds.max_regressed_cells
             if max_reg is not None:

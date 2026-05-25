@@ -58,8 +58,9 @@ gategrid baseline update --from-report PATH --profile ID
 | `ReportOverall` / `BaselineOverall` | `pass_rate`, `duration_ms_mean`, `cell_count`, `metrics: dict[str, float]` — no typed `turns_mean` / `tokens_spent_mean` |
 | Gate bounds | `metric_mean_min`, `metric_mean_max`, `metric_mean_min_delta`, `metric_mean_max_delta` (per-key dicts); `pass_rate_*` stay first-class |
 | Cell reporting | No top-level `CellResult.turns` / `tokens_spent` / `tool_failures` — values in `cell.metrics` only |
+| LFL representativeness | When `bounds.like_for_like` is configured, gate requires intersection share ≥ `min_like_for_like_share` (default 1.0) — see [ADR 0007](0007-gategrid-phase5-ci-productization.md) |
 
 ## See also
 
-- [v1-implementation-checklist.md](../roadmap/v1-implementation-checklist.md)
-- [architecture-vision.md](../roadmap/architecture-vision.md)
+- [v1-implementation-checklist.md](../roadmap/engineering/v1-implementation-checklist.md)
+- [architecture-vision.md](../roadmap/engineering/architecture-vision.md)

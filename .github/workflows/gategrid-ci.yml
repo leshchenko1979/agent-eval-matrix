@@ -1,6 +1,4 @@
-name: Gategrid
-
-# Copy to .github/workflows/ or use gategrid-ci.yml in this repo.
+name: Gategrid CI
 
 on:
   push:
@@ -30,7 +28,7 @@ jobs:
             tests/test_gategrid_phase4.py tests/test_gategrid_cli_output.py \
             tests/test_gategrid_phase5.py
 
-      - name: Validate matrices
+      - name: Validate smoke and gate matrices
         run: |
           uv run gategrid validate --matrix examples/gategrid/matrices/smoke.yaml
           uv run gategrid validate --matrix examples/gategrid/matrices/ci-gate-mock.yaml --root examples/gategrid
@@ -40,12 +38,17 @@ jobs:
     if: github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@v6
-      - uses: astral-sh/setup-uv@v8
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v8
         with:
           python-version: "3.11"
           enable-cache: true
-      - run: uv sync --frozen
-      - name: Run and gate
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Run gate matrix and gate
         env:
           GATEGRID_HOME: ${{ github.workspace }}/.gategrid-ci
           GATEGRID_EVAL_ROOT: examples/gategrid
@@ -53,18 +56,24 @@ jobs:
           uv run gategrid run --matrix examples/gategrid/matrices/ci-gate-mock.yaml --root examples/gategrid
           REPORT=$(ls -t "$GATEGRID_HOME/reports"/*_matrix.json | head -1)
           uv run gategrid gate --matrix examples/gategrid/matrices/ci-gate-mock.yaml \
-            --report "$REPORT" --baseline examples/gategrid/ci/baselines/demo.json
+            --report "$REPORT" \
+            --baseline examples/gategrid/ci/baselines/demo.json
 
   baseline-main:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
     steps:
       - uses: actions/checkout@v6
-      - uses: astral-sh/setup-uv@v8
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v8
         with:
           python-version: "3.11"
           enable-cache: true
-      - run: uv sync --frozen
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
       - name: Refresh baseline artifact
         env:
           GATEGRID_HOME: ${{ github.workspace }}/.gategrid-ci
@@ -73,24 +82,33 @@ jobs:
           uv run gategrid run --matrix examples/gategrid/matrices/ci-gate-mock.yaml --root examples/gategrid
           REPORT=$(ls -t "$GATEGRID_HOME/reports"/*_matrix.json | head -1)
           uv run gategrid gate --matrix examples/gategrid/matrices/ci-gate-mock.yaml \
-            --report "$REPORT" --baseline examples/gategrid/ci/baselines/demo.json
+            --report "$REPORT" \
+            --baseline examples/gategrid/ci/baselines/demo.json
           uv run gategrid baseline update --from-report "$REPORT" --profile demo \
             --matrix examples/gategrid/matrices/ci-gate-mock.yaml
-      - uses: actions/upload-artifact@v4
+
+      - name: Upload baselines artifact
+        uses: actions/upload-artifact@v4
         with:
           name: gategrid-baselines
           path: .gategrid-ci/baselines/
+          if-no-files-found: error
 
   hashline-smoke:
     runs-on: ubuntu-latest
     if: github.event_name == 'workflow_dispatch'
     steps:
       - uses: actions/checkout@v6
-      - uses: astral-sh/setup-uv@v8
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v8
         with:
           python-version: "3.11"
           enable-cache: true
-      - run: uv sync --frozen --extra pydantic-ai
+
+      - name: Install dependencies
+        run: uv sync --frozen --extra pydantic-ai
+
       - name: Hashline smoke
         env:
           GATEGRID_HOME: ${{ github.workspace }}/.gategrid-ci

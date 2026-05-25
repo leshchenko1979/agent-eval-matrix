@@ -14,7 +14,7 @@ Phase 0 added schemas, `gate`, and `baseline update` under a monorepo still name
 | Core deps | `pydantic`, `pyyaml`, `python-dotenv` only |
 | Extras | `pydantic-ai` (adapter in Phase 2); `dev` = pytest; provider/report extras unchanged; **`mcp` deferred to Phase 4** |
 | Scripts | `gategrid` only — **no** `agent-eval-matrix` / `agent-eval` |
-| Packages shipped | `gategrid*` only — legacy harness removed after [legacy teardown](../roadmap/v1-implementation-checklist.md#legacy-teardown-after-spike-c) |
+| Packages shipped | `gategrid*` only — legacy harness removed after [legacy teardown](../roadmap/engineering/v1-implementation-checklist.md#legacy-teardown-after-spike-c) |
 | Legacy | **No** `[legacy]` extra, pydantic-evals bridge, or dual report formats |
 | Home writer | `ensure_home()` creates `baselines/`, `reports/`, `traces/` under `GATEGRID_HOME` / `.gategrid/`; called from `io.save_json` only |
 | Config models | `ProfileConfig`, `ModelConfig`, `CaseSetConfig` via Pydantic `BaseModel` — **no** pydantic-settings in Phase 1 |
@@ -36,4 +36,4 @@ Phase 0 added schemas, `gate`, and `baseline update` under a monorepo still name
 ## See also
 
 - [ADR 0001](0001-gategrid-phase0-schemas-cli-gate.md)
-- [v1 implementation checklist](../roadmap/v1-implementation-checklist.md)
+- [v1 implementation checklist](../roadmap/engineering/v1-implementation-checklist.md)

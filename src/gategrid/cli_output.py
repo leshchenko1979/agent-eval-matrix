@@ -122,6 +122,8 @@ def print_run_outcome(
     matrix_path: Path,
     eval_root: Path | None,
     case_filter: str | None = None,
+    model_filter: list[str] | None = None,
+    matrix_yaml_models: list[str] | None = None,
     verbose: bool = False,
     stream_stdout: Any = None,
     stream_stderr: Any = None,
@@ -145,6 +147,22 @@ def print_run_outcome(
             "warning: --case filter active; gate fingerprint may not match full matrix",
             file=stderr,
         )
+
+    if model_filter and matrix_yaml_models is not None:
+        yaml_models = ", ".join(matrix_yaml_models) or "(none)"
+        running = ", ".join(dict.fromkeys(model_filter))
+        msg = (
+            f"warning: --model override: matrix [{yaml_models}] -> running [{running}]; "
+            "gate baselines are per model_id — do not compare to baseline from another model"
+        )
+        try:
+            from gategrid.io import load_matrix_config
+
+            if load_matrix_config(matrix_path).gate is not None:
+                msg += " (matrix has gate:)"
+        except Exception:
+            pass
+        print(msg, file=stderr)
 
     emit_id_conventions(verbose=verbose, stream=stderr)
 

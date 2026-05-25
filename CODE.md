@@ -43,7 +43,7 @@ Durable **implementation guardrails** for agents and humans. Not product spec, p
 
 ## Paths and on-disk layout
 
-- **Artifacts under `.gategrid/`** (`GATEGRID_HOME`). Do not write Gategrid matrix JSON to repo-root `/reports/` (gitignored). Published bench write-ups live under **`docs/reports/`** (tracked).
+- **Artifacts under `.gategrid/`** (`GATEGRID_HOME`). Do not write Gategrid reports to repo-root `reports/`.
 - **`ensure_home()` only when writing under the active home** — pass `home=` through `save_json` for custom homes.
 - **Eval tree:** `matrices/`, `profiles/`, `models/`, `case_sets/`, optional `cases/`, `evaluators/`; matrix uses `profiles:` not `tool_sets`.
 

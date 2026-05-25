@@ -1,3 +1,4 @@
 name: demo
 cases:
   - hello_world
+  - echo_beta

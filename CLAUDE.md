@@ -1,8 +1,8 @@
 # Gategrid
 
-**Product:** [Gategrid](docs/roadmap/README-pitch-draft.md) — matrix eval runner with git-native CI gates.
+**Product:** [Gategrid](docs/roadmap/product/README-pitch-draft.md) — matrix eval runner with git-native CI gates.
 
-**User-facing pitch:** [README.md](README.md). Roadmap: [docs/roadmap/v1-implementation-checklist.md](docs/roadmap/v1-implementation-checklist.md).
+**User-facing pitch:** [README.md](README.md). Roadmap: [docs/roadmap/engineering/v1-implementation-checklist.md](docs/roadmap/engineering/v1-implementation-checklist.md).
 
 ## Setup
 
@@ -13,10 +13,13 @@ gategrid validate --matrix examples/gategrid/matrices/smoke.yaml
 gategrid run --matrix examples/gategrid/matrices/smoke.yaml
 pytest tests/test_gategrid_phase0.py tests/test_gategrid_phase1.py \
  tests/test_gategrid_phase2.py tests/test_gategrid_phase3.py \
- tests/test_gategrid_phase4.py
+ tests/test_gategrid_phase4.py tests/test_gategrid_cli_output.py \
+ tests/test_gategrid_phase5.py tests/test_gategrid_spike_c.py
 ```
 
-For hashline / LLM dogfood: `uv sync --extra dev --extra pydantic-ai`.
+For hashline / LLM dogfood and full exit tests: `uv sync --extra dev --extra pydantic-ai`.
+
+`run` / `validate` accept `--model <id>` to override matrix `models:` (presets under `eval_root/models/`). See [examples/gategrid/README.md](examples/gategrid/README.md#using-another-model).
 
 Artifacts live under `.gategrid/` (`GATEGRID_HOME` overrides). ADRs: [docs/adr/](docs/adr/). **Coding principles:** [CODE.md](CODE.md) — reread before implementation (after plan approval); update after post-impl review ([implementation workflow](.cursor/rules/gategrid-phase-workflow.mdc)).
 
@@ -32,10 +35,10 @@ pytest tests/test_gategrid_spike_c.py tests/test_gategrid_file_edit_batteries.py
 
 | Path | Role |
 | ---- | ---- |
-| `examples/opencrabs/matrices/` | Runnable matrices (`hashline-smoke`, `hashline-gate`, `hashline-bench`, …) |
+| `examples/opencrabs/matrices/` | `hashline-smoke`, `hashline-gate` (CI gate), `hashline-bench` (research) — [README](examples/opencrabs/README.md) |
 | `examples/opencrabs/profiles/` | `runtime_adapter` + `data.system_prompt` / `data.tools` |
-| `examples/opencrabs/models/` | Model presets (`provider`, `model_name`, `api_key_env`, …) |
-| `examples/opencrabs/cases/` | `@case` registration + YAML case bodies |
+| `examples/opencrabs/models/` | Model presets (`mock`, `minimax-m2.7`, `openai-mini`); bench with `--model <id>` |
+| Builtin cases | `gategrid.contrib.file_edit.bundled` (same ids as [examples/file_edit/](examples/file_edit/)) |
 | `examples/opencrabs/tooling/opencrabs/` | OpenCrabs-style tools (one tool per file) |
 | `examples/opencrabs/adapters/` | `file_edit` runtime adapter |
 
@@ -57,7 +60,11 @@ pytest tests/test_gategrid_spike_c.py tests/test_gategrid_file_edit_batteries.py
 gategrid run --matrix examples/opencrabs/matrices/hashline-bench.yaml --root examples/opencrabs
 ```
 
-**Report:** [docs/hashline_hypothesis_report.md](docs/hashline_hypothesis_report.md). Regenerate figures: `uv sync --extra report` then `uv run python docs/_build_report_viz.py` (set `GATEGRID_REPORT_JSON` to a `.gategrid/reports/*.json` from a bench run).
+**Bench analysis:** [docs/guides/bench-analysis.md](docs/guides/bench-analysis.md) (how to read bench JSON vs CI gates).
+
+**Report:** [docs/reports/hashline/hashline_hypothesis_report.md](docs/reports/hashline/hashline_hypothesis_report.md). Regenerate figures: `uv sync --extra report` then `uv run python docs/reports/hashline/_build_report_viz.py` (set `GATEGRID_REPORT_JSON` to a `.gategrid/reports/*.json` from a bench run).
+
+**DX vs competitors (OpenCrabs):** [docs/roadmap/research/spike-dx-competitive-analysis.md](docs/roadmap/research/spike-dx-competitive-analysis.md) — required for all spikes; minimal path is [examples/file_edit/](examples/file_edit/), not full opencrabs tree.
 
 ## Observability
 

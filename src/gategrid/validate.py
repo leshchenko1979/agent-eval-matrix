@@ -37,6 +37,22 @@ class ValidationResult:
         self.errors.append(message)
 
 
+def effective_model_ids(
+    matrix: MatrixConfig,
+    model_filter: list[str] | None,
+) -> list[str]:
+    """CLI --model replaces matrix.models; dedupe while preserving order."""
+    if model_filter:
+        return list(dict.fromkeys(model_filter))
+    return list(matrix.models)
+
+
+def _available_model_ids(models_dir: Path) -> list[str]:
+    if not models_dir.is_dir():
+        return []
+    return sorted(p.stem for p in models_dir.glob("*.yaml"))
+
+
 def resolve_eval_root(matrix_path: Path, root: Path | None) -> Path:
     matrix_path = matrix_path.resolve()
     if root is not None:
@@ -54,6 +70,7 @@ def validate_matrix(
     *,
     root: Path | None = None,
     emit_conventions: bool = False,
+    model_filter: list[str] | None = None,
 ) -> ValidationResult:
     result = ValidationResult()
     matrix_path = matrix_path.resolve()
@@ -72,6 +89,7 @@ def validate_matrix(
         result.add(f"matrix {matrix_path.name}: {exc}")
         return result
 
+    model_ids = effective_model_ids(matrix, model_filter)
     _validate_matrix_refs(
         matrix,
         eval_root,
@@ -79,13 +97,16 @@ def validate_matrix(
         models_dir,
         case_sets_dir,
         result,
+        model_ids=model_ids,
     )
     if result.ok:
         _validate_case_ids(matrix, eval_root, result)
     if result.ok:
         _validate_evaluators(eval_root, result)
     if result.ok:
-        _validate_api_keys(matrix, models_dir, result)
+        _validate_run_sample(matrix, result)
+    if result.ok:
+        _validate_api_keys(model_ids, models_dir, result)
     if result.ok:
         try:
             case_id_qualify_mode()
@@ -102,6 +123,16 @@ def validate_matrix(
     return result
 
 
+def _validate_run_sample(matrix: MatrixConfig, result: ValidationResult) -> None:
+    sample = matrix.run.sample
+    if sample is None:
+        return
+    try:
+        sample.model_validate(sample.model_dump())
+    except Exception as exc:
+        result.add(f"run.sample: {exc}")
+
+
 def _validate_evaluators(eval_root: Path, result: ValidationResult) -> None:
     try:
         discover_evaluators(eval_root)
@@ -110,12 +141,12 @@ def _validate_evaluators(eval_root: Path, result: ValidationResult) -> None:
 
 
 def _validate_api_keys(
-    matrix: MatrixConfig,
+    model_ids: list[str],
     models_dir: Path,
     result: ValidationResult,
 ) -> None:
     registry: dict[str, ModelConfig] = {}
-    for model_id in matrix.models:
+    for model_id in model_ids:
         path = models_dir / f"{model_id}.yaml"
         if not path.is_file():
             continue
@@ -123,7 +154,7 @@ def _validate_api_keys(
             registry[model_id] = load_yaml_model(path, ModelConfig)
         except Exception:
             continue
-    missing = missing_api_keys(matrix.models, registry)
+    missing = missing_api_keys(model_ids, registry)
     if missing:
         vars_list = ", ".join(missing)
         result.add(
@@ -139,6 +170,8 @@ def _validate_matrix_refs(
     models_dir: Path,
     case_sets_dir: Path,
     result: ValidationResult,
+    *,
+    model_ids: list[str],
 ) -> None:
     for profile_id in matrix.profiles:
         path = profiles_dir / f"{profile_id}.yaml"
@@ -150,10 +183,14 @@ def _validate_matrix_refs(
         except Exception as exc:
             result.add(f"profile {profile_id!r}: {exc}")
 
-    for model_id in matrix.models:
+    available = _available_model_ids(models_dir)
+    available_hint = f" (available models: {', '.join(available)})" if available else ""
+    for model_id in model_ids:
         path = models_dir / f"{model_id}.yaml"
         if not path.is_file():
-            result.add(f"model {model_id!r}: missing {path.relative_to(eval_root)}")
+            result.add(
+                f"model {model_id!r}: missing {path.relative_to(eval_root)}{available_hint}"
+            )
             continue
         try:
             load_yaml_model(path, ModelConfig)

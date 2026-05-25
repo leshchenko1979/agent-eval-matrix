@@ -31,5 +31,5 @@ Phase 0–1 froze schemas, gate/baseline CLI, and config validation. Phase 2 con
 
 ## See also
 
-- [v1-implementation-checklist.md](../roadmap/v1-implementation-checklist.md) Phase 2
+- [v1-implementation-checklist.md](../roadmap/engineering/v1-implementation-checklist.md) Phase 2
 - [0001-gategrid-phase0-schemas-cli-gate.md](0001-gategrid-phase0-schemas-cli-gate.md)

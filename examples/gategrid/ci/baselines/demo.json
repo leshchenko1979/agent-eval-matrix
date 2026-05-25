@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "profile_id": "demo",
+  "updated_at": "2026-05-25T08:54:36.624907+00:00",
+  "source_report_path": "examples/gategrid/ci/baselines/demo.json",
+  "fingerprint": {
+    "matrix_name": "ci-gate-mock",
+    "profile_ids": [
+      "demo"
+    ],
+    "case_ids": [
+      "echo_beta",
+      "hello_world"
+    ]
+  },
+  "overall": {
+    "pass_rate": 1.0,
+    "duration_ms_mean": 0.01877098111435771,
+    "cell_count": 2,
+    "metrics": {}
+  },
+  "cells": {
+    "hello_world\u0000demo\u0000mock": {
+      "key": {
+        "case_id": "hello_world",
+        "profile_id": "demo",
+        "model_id": "mock"
+      },
+      "passed": true,
+      "duration_ms": 0.02604199107736349,
+      "metrics": {
+        "turns": 1,
+        "tokens_spent": 0,
+        "echo_turns.turns": 1
+      }
+    },
+    "echo_beta\u0000demo\u0000mock": {
+      "key": {
+        "case_id": "echo_beta",
+        "profile_id": "demo",
+        "model_id": "mock"
+      },
+      "passed": true,
+      "duration_ms": 0.011499971151351929,
+      "metrics": {
+        "turns": 1,
+        "tokens_spent": 0,
+        "echo_turns.turns": 1
+      }
+    }
+  }
+}

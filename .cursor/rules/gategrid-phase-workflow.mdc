@@ -5,57 +5,59 @@ alwaysApply: true
 
 # Implementation workflow
 
-**Any user suggestion that involves code changes** follows steps 1–6. **User reviews the plan only** (step 3), not implementation diffs.
+Any code change follows **steps 1–6**. The user approves at **step 3 only** (the plan), not implementation diffs.
 
-**Start:** If not already in Plan mode, **switch to Plan mode** before step 1. Do not implement until step 3 approval.
+**Start:** Plan mode before step 1. No code until explicit step 3 approval.
 
 ## Steps
 
-| Step | Mode | Action |
-| ---- | ---- | ------ |
-| **1** | Plan | Draft plan: scope, files, exit commands, clean-break checks. Link checklist rows when relevant. Store in `~/.cursor/plans/<task>_*.md` only (not in-repo). |
-| **2** | Plan | Pre-implementation subagent review (`code-reviewer`, readonly): simplify scope and clarify the plan. Revise plan; **do not code**. Leave **comprehensible** text — see **Step 2 — simplicity** below. |
-| **3** | Plan → Agent | **HIIL:** Present plan; wait for user command. **User reviews the plan only** — not implementation diffs. |
-| **4** | Agent | Run exit tests/commands. Fix before step 5. Proceed without asking for user confirmation. |
-| **5** | Agent | Post-implementation subagent review vs approved plan + clean break. |
-| **6** | Agent | Fix blocking findings. Re-test. Merge non-obvious lessons into [CODE.md](CODE.md) (topic sections; no new "Phase N" blocks). Mark checklist `[x]` when applicable. Update [CLAUDE.md](CLAUDE.md) if needed. |
+| Step | Mode | Action | Gate |
+| ---- | ---- | ------ | ---- |
+| **1** | Plan | Scope, files, exit commands, clean-break checks; link checklist rows. Plan file: `~/.cursor/plans/<task>_*.md` only (not in-repo). | — |
+| **2** | Plan | Pre-impl review (`code-reviewer`, readonly): trim scope; DX if user-facing; **Deferred** for cuts. Revise plan; **no code**. | Scope trimmed; exits set; **Deferred** if anything cut; plan stand-alone; incremental edits keep **previous plan** |
+| **3** | Plan → Agent | Present plan; wait for approval; roadmap ask if **Deferred** (below). | Roadmap ask if **Deferred**; explicit approval |
+| **4** | Agent | Run exit tests/commands; fix failures. No extra confirmation prompts. | — |
+| **5** | Agent | Post-impl review vs approved plan + [clean break](docs/roadmap/engineering/v1-implementation-checklist.md#clean-break-policy-v1--no-legacy-path). | Diff matches plan; no legacy creep |
+| **6** | Agent | Fix blocking findings; re-test; update [CODE.md](CODE.md) (topic sections only), checklist `[x]`, [CLAUDE.md](CLAUDE.md) if needed. | Blocking fixes; durable lessons → CODE.md |
 
-## Step 3 — HIIL loop
+Before step 4: reread [CODE.md](CODE.md). Boundaries: [CODE.md — what belongs](CODE.md#what-belongs-here); clean break: checklist + [CODE.md — packaging](CODE.md#packaging-and-clean-break).
 
-At step 3, stop and wait for the user.
+## Step 2 — Plan review
 
-| User response | Next step |
-| ------------- | --------- |
-| **Feedback or change request** | **→ step 2** — analyze comments (see below), **incrementally revise** the plan, re-run pre-impl review. Do not implement yet. Preserve the prior version as **previous plan** — see **Step 2 — simplicity**. |
-| **Explicit approval** | **Reread [CODE.md](CODE.md)**. Switch to Agent mode. Implement (then step 4). |
+**Goals:** Smaller scope; better user-facing DX — without telegram-style compression.
 
-Repeat **2 → 3** until the user explicitly approves.
+| Lens | When relevant |
+| ---- | ------------- |
+| **Time-to-results** | Fewer commands to first green; mock/no-key path in exits |
+| **Ceremony vs value** | Extend existing YAML/CLI; drop boilerplate that does not buy gate/regression value |
+| **Errors & discoverability** | Failures name the fix (path, flag, field); examples/README in-plan when behavior changes |
+| **Spikes** | Comparative claims → [spike-dx-competitive-analysis.md](docs/roadmap/research/spike-dx-competitive-analysis.md) A–C; split orchestration vs domain |
 
-## Step 2 — simplicity
+DX vs minimal scope → **record tradeoff** in plan (default: smaller scope unless user asked for DX).
 
-Pre-impl review aims for **clearer, smaller scope** — not telegram-style compression.
+**Deferred:** One line per cut (what + why). Never silently drop user- or spike-requested work.
 
-After revision, the plan must still be **human-readable at step 3**: full sentences; explicit scope, files, and exit commands; enough rationale that a reader can approve or push back. **Brevity must not become nonsense** — if trimming removes needed context or leaves ambiguous steps, keep or rewrite instead of shrinking.
+**Plan quality (step 3):** Full sentences; explicit scope, files, exits, rationale. After feedback: revise **incrementally** in the same file; keep **previous plan**; state what changed. Current plan must **stand alone**.
 
-**Repeat step 2 (after HIIL feedback):** revise **incrementally** — do not replace the plan with a short summary that drops whole sections. Keep the last approved draft as **previous plan** (same file, clearly labeled section or revision note). The new draft must retain all still-valid scope, files, exits, and decisions from the previous plan; changes should be explicit (what changed and why). **Never omit huge chunks** and point at the previous plan as a substitute — the current plan presented at step 3 must stand alone.
+## Step 3 — Approval
 
-## User plan comments
+Stop and wait for the user.
 
-Feedback at step 3 is input, not automatic requirements. **Analyze** each comment against CODE.md, the checklist, ADRs, and the current codebase. Accept and update the plan, push back with tradeoffs, or propose a smaller alternative **before** coding. Record substantive decisions in the plan or ADR.
+**Deferred → roadmap:** If **Deferred** is non-empty, ask where to park items **before** approval. Do not edit roadmap docs until the user answers; record choice in the plan (`Phase N` / `ADOPT-00x` / spike note / none). Update roadmap in-session only on yes.
 
-## Gates (same weight as tests)
+| Target | Use for |
+| ------ | ------- |
+| [v1-implementation-checklist.md](docs/roadmap/engineering/v1-implementation-checklist.md) | Phase row or post-v1 follow-up |
+| [adoption-usability-backlog.md](docs/roadmap/research/adoption-usability-backlog.md) | ADOPT ergonomics / adoption |
+| Spike / research notes | DX or dogfood deferrals |
 
-- Step 2: pre-implementation review (scope, exits; drop speculative work; plan stays comprehensible; repeat reviews preserve previous plan, no chunk deletion)
-- Step 3: explicit user approval + reread CODE.md before coding
-- Step 5: diff vs plan; no legacy creep
-- Step 6: merge durable guardrails → CODE.md
+| User response | Next |
+| ------------- | ---- |
+| Feedback / change request | → step 2: vs CODE.md, checklist, ADRs, codebase; accept, push back, or smaller alternative; record in plan or ADR; re-run pre-impl review; preserve **previous plan**. No code. |
+| Explicit approval | Reread CODE.md; Agent mode; step 4. |
+
+Repeat **2 → 3** until explicit approval.
 
 ## After close
 
-Optionally remind the user they can run `/summarize` to compact context (user-initiated; not an agent step).
-
-## Clean break reminders
-
-- Core = `@case` + `RuntimeAdapter` + `@evaluator`; file-edit in `contrib`, not core
-- Artifacts under `.gategrid/` only; no legacy bridges (`tool_sets`, pydantic-evals, dual report formats)
-- See checklist [Clean break policy](docs/roadmap/v1-implementation-checklist.md#clean-break-policy-v1--no-legacy-path)
+Optionally remind: `/summarize` to compact context (user-initiated).

@@ -1,10 +1,10 @@
 # Competitive landscape
 
-**Status:** 2026-05-24 · aligns with [architecture-vision.md](architecture-vision.md) and [README-pitch-draft.md](README-pitch-draft.md).
+**Status:** 2026-05-24 · aligns with [architecture-vision.md](../engineering/architecture-vision.md) and [README-pitch-draft.md](README-pitch-draft.md).
 
 **Positioning (one line):** Self-hosted matrix runner that turns *your* agent/MCP test suite into a **codecov-style CI gate** for **one production profile** at a time — not another prompt benchmarker or observability SaaS.
 
-**Related:** [battlecard.md](battlecard.md) (promptfoo vs DeepEval vs us) · [v1-implementation-checklist.md](v1-implementation-checklist.md) · [Product naming](#product-naming-revisited)
+**Related:** [battlecard.md](battlecard.md) (promptfoo vs DeepEval vs us) · [spike-dx-competitive-analysis.md](../research/spike-dx-competitive-analysis.md) (per-spike DX vs competitors) · [v1-implementation-checklist.md](../engineering/v1-implementation-checklist.md) · [Product naming](#product-naming-revisited)
 
 ---
 
@@ -207,7 +207,8 @@ MCP / agents         →  messaging, not acronym (avoid "AEM")
 
 ## See also
 
+- [spike-dx-competitive-analysis.md](../research/spike-dx-competitive-analysis.md) — measured DX vs competitors per dogfood spike (Tasks A/B/C)
 - [battlecard.md](battlecard.md) — sales/engineering one-pager vs promptfoo and DeepEval
-- [v1-implementation-checklist.md](v1-implementation-checklist.md) — build order to reach competitive parity on the wedge
-- [architecture-vision.md](architecture-vision.md) — full design
+- [v1-implementation-checklist.md](../engineering/v1-implementation-checklist.md) — build order to reach competitive parity on the wedge
+- [architecture-vision.md](../engineering/architecture-vision.md) — full design
 - [README-pitch-draft.md](README-pitch-draft.md) — user-facing pitch (Gategrid branding)

@@ -11,6 +11,16 @@ class SampleConfig(BaseModel):
     seed: int = 0
     always_include_tags: list[str] = Field(default_factory=list)
 
+    @model_validator(mode="after")
+    def validate_sample_bounds(self) -> SampleConfig:
+        if self.max_cells is not None and self.max_cells < 1:
+            raise ValueError("run.sample.max_cells must be >= 1 when set")
+        if self.share is not None and not (0.0 < self.share <= 1.0):
+            raise ValueError("run.sample.share must be in (0, 1] when set")
+        if self.max_cells is None and self.share is None:
+            raise ValueError("run.sample requires max_cells and/or share")
+        return self
+
 
 class RunConfig(BaseModel):
     max_retries: int = 0
